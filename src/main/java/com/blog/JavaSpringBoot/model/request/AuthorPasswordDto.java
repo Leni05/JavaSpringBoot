@@ -1,6 +1,5 @@
 package com.blog.JavaSpringBoot.model.request;
 
-
 import javax.persistence.Column;
 
 import lombok.Getter;
