@@ -30,58 +30,60 @@ public class CommentController {
     @Autowired
     private CommentRepository commentRepository;
 
-    @Autowired
-    private CommentService commentService;
+    // @Autowired
+    // private CommentService commentService;
 
-    @Autowired
-    private BlogRepository blogRepository;
+    // @Autowired
+    // private BlogRepository blogRepository;
 
     @GetMapping(value = "/{blog}/comments")
     public ResponseEntity<ResponseBase> getComment(@PathVariable Integer blogId) {
         ResponseBase response = new ResponseBase<>();
 
-        // List<Comment> comment = commentRepository.findCommentBlog(blogId);
-        response.setData(commentRepository.findAll());
+        List<Comment> comment = commentRepository.findCommentByBlogId(blogId);
+
+        // response.setData(commentRepository.findAll());
+        response.setData(comment);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<ResponseBase> getCommentById(@PathVariable Integer id) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @GetMapping(value = "/{id}")
+    // public ResponseEntity<ResponseBase> getCommentById(@PathVariable Integer id) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-        Comment comments = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+    //     Comment comments = commentRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
 
-        response.setData(comments);
+    //     response.setData(comments);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
-    @PostMapping("/{blogs}/comments")
-    public ResponseEntity<ResponseBase> postComment(@PathVariable Integer blogs, @RequestBody Comment comment)
-            throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @PostMapping("/{blogs}/comments")
+    // public ResponseEntity<ResponseBase> postComment(@PathVariable Integer blogs, @RequestBody Comment comment)
+    //         throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
    
-        Blog blogData = blogRepository.findById(blogs).orElseThrow(() -> new NotFoundException("Blog id " + blogs + " NotFound"));
+    //     Blog blogData = blogRepository.findById(blogs).orElseThrow(() -> new NotFoundException("Blog id " + blogs + " NotFound"));
        
-        comment.setBlogs_id(blogData.getId());
+    //     comment.setBlogs_id(blogData.getId());
 
-        try {
+    //     try {
         
-            response.setData(commentRepository.save(comment));
+    //         response.setData(commentRepository.save(comment));
             
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
     

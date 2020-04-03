@@ -137,5 +137,23 @@ public class AuthorController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<ResponseBase> deleteAuthorById(@RequestBody Author author) throws NotFoundException {
+        ResponseBase response = new ResponseBase<>();
+
+        Author authors = authorRepository.findById(author.getId()).orElseThrow(() -> new NotFoundException("Author id " + author.getId() + " NotFound"));
+
+        try {
+            authorRepository.deleteById(authors.getId());
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

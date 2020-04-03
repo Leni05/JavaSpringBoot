@@ -106,5 +106,27 @@ public class TagsController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @DeleteMapping()
+    public ResponseEntity<ResponseBase> deteleTagsById(@RequestBody Tags tags) throws NotFoundException {
+        ResponseBase response = new ResponseBase<>();
+
+        Tags tagss = tagsRepository.findById(tags.getId()).orElseThrow(() -> new NotFoundException("Categories id " + tags.getId() + " NotFound"));
+
+
+        try {
+            tagsRepository.deleteById(tagss.getId());
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
     
 }

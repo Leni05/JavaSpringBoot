@@ -17,6 +17,9 @@ import javassist.NotFoundException;
 import com.blog.JavaSpringBoot.model.Categories;
 import com.blog.JavaSpringBoot.repository.CategoriesRepository;
 import com.blog.JavaSpringBoot.service.CategoriesService;
+
+import javax.management.relation.RelationNotFoundException;
+
 import com.blog.JavaSpringBoot.exeption.ResponseBase;
 
 
@@ -92,12 +95,34 @@ public class CategoriesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/")
-    public ResponseEntity<ResponseBase> deleteCategories(@RequestBody Integer categoriesId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseBase> deleteCategories(@PathVariable Integer id) {
         ResponseBase response = new ResponseBase<>();
 
         try {
-            categoriesRepository.deleteCataegorieById(categoriesId);
+            categoriesRepository.deleteById(id);
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping()
+    public ResponseEntity<ResponseBase> deleteCategories(@RequestBody Categories categoriesData) throws NotFoundException {
+        
+        ResponseBase response = new ResponseBase<>();
+        Categories category = categoriesRepository.findById(categoriesData.getId()).orElseThrow(() -> new NotFoundException("Categories id " + categoriesData.getId() + " NotFound"));
+
+        try {
+
+            //response.setData(categoriesRepository.deleteById(categoryId));
+            categoriesRepository.deleteById(category.getId());
         } catch (Exception e) {
             response.setStatus(false);
             response.setCode(500);

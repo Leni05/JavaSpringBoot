@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface CommentRepository extends JpaRepository<Comment, Integer>{
 
-    // @Query(value = "SELECT * from Comment WHERE blogs_id = ?1", nativeQuery = true)
-    // List<Comment> findCommentBlog(Integer blog_id);
+    @Query(value = "SELECT * from Comment WHERE blogs_id = ?1", nativeQuery = true)
+    List<Comment> findCommentByBlogId(Integer blogs_id);
 
     // @Modifying
     // @Transactional
