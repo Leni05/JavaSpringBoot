@@ -41,54 +41,25 @@ public class TagsController {
     @Autowired
     TagsService tagsService;
 
-    // @GetMapping()
-    // public ResponseEntity<ResponseBase> getTags() {
-    //     ResponseBase response = new ResponseBase<>();
+    @GetMapping("/getAll")
+    public ResponseEntity<ResponseBase> getTags() {
+        ResponseBase response = new ResponseBase<>();
 
-    //     response.setData(tagsRepository.findAll());
+        response.setData(tagsRepository.findAll());
 
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-    // @GetMapping(value = "/{id}")
-    // public ResponseEntity<ResponseBase> getTagsById(@PathVariable Integer id) throws NotFoundException {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     Tags tags = tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
-
-    //     response.setData(tags);
-
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-
-    @GetMapping
-    public ResponseBaseDTO<MyPage<ResponseTagsDTO>> listTags(
-        MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
-    ) { 
-       Page<ResponseTagsDTO> tags;
-
-       if (param != null) {
-           tags = tagsService.findByNameParams(MyPageable.convertToPageable(pageable), param);
-       } else {
-           tags = tagsService.findAll(MyPageable.convertToPageable(pageable));
-       }
-
-       PageConverter<ResponseTagsDTO> converter = new PageConverter<>();
-       String url = String.format("%s://%s:%d/api/tags",request.getScheme(),  request.getServerName(), request.getServerPort());
-
-       String search = "";
-
-       if(param != null){
-           search += "&param="+param;
-       }
-
-       MyPage<ResponseTagsDTO> response = converter.convert(tags, url, search);
-
-       return ResponseBaseDTO.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ResponseBase> getTagsById(@PathVariable Integer id) throws NotFoundException {
+        ResponseBase response = new ResponseBase<>();
 
+        Tags tags = tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+
+        response.setData(tags);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PostMapping()
     public ResponseEntity<ResponseBase> postTags(@RequestBody Tags tags) {
@@ -164,6 +135,34 @@ public class TagsController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    
+
+    // ====================================================== With Pagination =====================================================
+
+
+    @GetMapping
+    public ResponseBaseDTO<MyPage<ResponseTagsDTO>> listTags(
+        MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
+    ) { 
+       Page<ResponseTagsDTO> tags;
+
+       if (param != null) {
+           tags = tagsService.findByNameParams(MyPageable.convertToPageable(pageable), param);
+       } else {
+           tags = tagsService.findAll(MyPageable.convertToPageable(pageable));
+       }
+
+       PageConverter<ResponseTagsDTO> converter = new PageConverter<>();
+       String url = String.format("%s://%s:%d/tags",request.getScheme(),  request.getServerName(), request.getServerPort());
+
+       String search = "";
+
+       if(param != null){
+           search += "&param="+param;
+       }
+
+       MyPage<ResponseTagsDTO> response = converter.convert(tags, url, search);
+
+       return ResponseBaseDTO.ok(response);
+    }    
     
 }

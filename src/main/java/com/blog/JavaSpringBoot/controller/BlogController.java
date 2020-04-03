@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javassist.NotFoundException;
+
+import com.blog.JavaSpringBoot.exeption.ResourceNotFoundException;
 import com.blog.JavaSpringBoot.exeption.ResponseBase;
 import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
@@ -73,7 +75,7 @@ public class BlogController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping()
+    @PostMapping("/")
     public ResponseEntity<ResponseBase> postBlog(@RequestBody Blog blog) throws NotFoundException {
         ResponseBase response = new ResponseBase<>();
 
@@ -144,23 +146,28 @@ public class BlogController {
 
 
     @DeleteMapping()
-    public ResponseEntity<ResponseBase> deteleBlogById(@RequestBody Blog blogs) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    public ResponseEntity<ResponseBase> deleteBlogRequest(@RequestBody Blog blogData) {
 
-        Blog blogData = blogRepository.findById(blogs.getId()).orElseThrow(() -> new NotFoundException("blog id " + blogs.getId() + " NotFound"));
+        ResponseBase response = new ResponseBase();
 
+        Blog blog = blogRepository.findById(blogData.getId()).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blogData.getId()));
 
         try {
-            tagsRepository.deleteById(blogData.getId());
+            
+            blogRepository.deleteById(blogData.getId());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
         } catch (Exception e) {
+            
             response.setStatus(false);
             response.setCode(500);
             response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(response, HttpStatus.EXPECTATION_FAILED);
+
         }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
     

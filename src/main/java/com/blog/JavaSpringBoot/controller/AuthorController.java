@@ -1,8 +1,11 @@
 package com.blog.JavaSpringBoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,12 +14,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javassist.NotFoundException;
 import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
 import com.blog.JavaSpringBoot.service.Authorservice;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.blog.JavaSpringBoot.common.MyPage;
+import com.blog.JavaSpringBoot.common.MyPageable;
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseAuthorDTO;
+import com.blog.JavaSpringBoot.common.util.PageConverter;
 import com.blog.JavaSpringBoot.exeption.ResponseBase;
 import com.blog.JavaSpringBoot.model.request.AuthorDto;
 import com.blog.JavaSpringBoot.model.request.AuthorPasswordDto;
@@ -35,7 +47,12 @@ public class AuthorController {
     @Autowired
     private Authorservice authorService;
 
-    @GetMapping()
+    // @Bean
+    // public BCryptPasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+    
+    @GetMapping("getAll")
     public ResponseEntity<ResponseBase> getAuthor() {
         ResponseBase response = new ResponseBase<>();
 
@@ -50,6 +67,7 @@ public class AuthorController {
 
         Author author = authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author id " + id + " NotFound"));
 
+        // author.setPassword(passwordEncoder().encode(author.getPassword()));
         response.setData(author);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -154,6 +172,34 @@ public class AuthorController {
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    //=================================================== With pagination ================================================
+
+    @GetMapping
+    public ResponseBaseDTO<MyPage<ResponseAuthorDTO>> listAuthor(
+        MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
+    ) { 
+       Page<ResponseAuthorDTO> authors;
+
+       if (param != null) {
+           authors = authorService.findAuthor(MyPageable.convertToPageable(pageable), param);
+       } else {
+        authors = authorService.findAll(MyPageable.convertToPageable(pageable));
+       }
+
+       PageConverter<ResponseAuthorDTO> converter = new PageConverter<>();
+       String url = String.format("%s://%s:%d/tags",request.getScheme(),  request.getServerName(), request.getServerPort());
+
+       String search = "";
+
+       if(param != null){
+           search += "&param="+param;
+       }
+
+       MyPage<ResponseAuthorDTO> response = converter.convert(authors, url, search);
+
+       return ResponseBaseDTO.ok(response);
     }
 
 }

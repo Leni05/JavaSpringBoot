@@ -33,7 +33,7 @@ public class MyPageable {
             if (myPageable.getSize() != null) {
                 size = myPageable.getSize();
             } else {
-                size = 3;
+                size = 20;
             }
 
             if(myPageable.getSortBy() != null) {
@@ -48,12 +48,12 @@ public class MyPageable {
         } else {
             if(myPageable.getSortBy() != null) {
                 if(myPageable.getSort().toLowerCase().equals("asc")){
-                    return PageRequest.of(0, 3, Sort.by(Sort.Direction.ASC, myPageable.getSortBy()));
+                    return PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, myPageable.getSortBy()));
                 }
 
-                return PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, myPageable.getSortBy() ));
+                return PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, myPageable.getSortBy() ));
             }
-            return PageRequest.of(0, 3);
+            return PageRequest.of(0, 20);
         }
     }
 }

@@ -1,15 +1,28 @@
 package com.blog.JavaSpringBoot.service;
 
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseAuthorDTO;
+import com.blog.JavaSpringBoot.common.util.DateTime;
 import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
+
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+
+import lombok.extern.slf4j.Slf4j;
 /**
  * Authorservice
  */
+@Slf4j
 @Service
 public class Authorservice {
     @Autowired
@@ -37,6 +50,44 @@ public class Authorservice {
         author.setId((id));
 
         return authorRepository.save(author);
+    }
+
+    @Autowired
+    private DateTime dateTime;
+
+    private static final String RESOURCE = "Tags";
+    private static final String FIELD = "id";
+
+
+    public Page<ResponseAuthorDTO> findAll(Pageable pageable) {
+        try {
+
+            return authorRepository.findAll(pageable).map(this::fromEntity);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    public Page<ResponseAuthorDTO> findAuthor(Pageable pageable, String param) {
+
+        try {
+            param = param.toLowerCase();
+            return authorRepository.findAuthor(pageable, param).map(this::fromEntity);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    private ResponseAuthorDTO fromEntity(Author authors) {
+        ResponseAuthorDTO response = new ResponseAuthorDTO();
+        BeanUtils.copyProperties(authors, response);
+        return response;
     }
     
 }
