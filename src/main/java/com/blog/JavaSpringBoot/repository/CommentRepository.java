@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
 import com.blog.JavaSpringBoot.model.Comment;
 
 import org.springframework.data.domain.Page;
@@ -20,14 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface CommentRepository extends JpaRepository<Comment, Integer>{
 
-    @Query(value = "SELECT * from Comment WHERE blogs_id = ?1", nativeQuery = true)
-    List<Comment> findCommentByBlogId(Integer blogs_id);
+    @Query(value = "SELECT * from comment WHERE blogs_id = ?1", nativeQuery = true)
+    List<Comment> findCommentByBlogId(Integer blog);
 
-    // @Modifying
-    // @Transactional
-    // @Query(value = "DELETE FROM Comment WHERE comment.id = ?1 AND comment.blogs_id = ?2", nativeQuery = true)
-    // void deleteCommentId(Integer id, Integer blogId);
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM comment WHERE comment.id = ?1 AND comment.blogs_id = ?2", nativeQuery = true)
+    void deleteByIdAndBlogId(Integer id, Integer blog);
 
-    // Comment findByIdAndBlogId(Integer id, Integer blogId);
-    
+    @Query(value = "SELECT * from comment WHERE  comment.id = ?1 AND comment.blogs_id = ?2", nativeQuery = true)
+    Comment findByIdAndBlogId(Integer id, Integer blog);
+
 }

@@ -36,7 +36,7 @@ import com.blog.JavaSpringBoot.model.request.BlogDto;
  */
 
 @RestController
-@RequestMapping("/blogs")
+@RequestMapping("/posts")
 public class BlogController {
     @Autowired
     private BlogRepository blogRepository;
@@ -116,6 +116,50 @@ public class BlogController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseBase> putBlog(@PathVariable Integer id, @RequestBody Blog blog) throws NotFoundException {
+        ResponseBase response = new ResponseBase<>();
+
+        Blog blogData =  blogRepository.findById(id).orElseThrow(() -> new NotFoundException("Blog id " + id + " NotFound"));
+
+        try {
+            blogData.setTitle(blog.getTitle());
+            blogData.setContent(blog.getContent());
+
+            response.setData(blogService.update(id, blogData));
+
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping()
+    public ResponseEntity<ResponseBase> deteleBlogById(@RequestBody Blog blogs) throws NotFoundException {
+        ResponseBase response = new ResponseBase<>();
+
+        Blog blogData = blogRepository.findById(blogs.getId()).orElseThrow(() -> new NotFoundException("blog id " + blogs.getId() + " NotFound"));
+
+
+        try {
+            tagsRepository.deleteById(blogData.getId());
+        } catch (Exception e) {
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
