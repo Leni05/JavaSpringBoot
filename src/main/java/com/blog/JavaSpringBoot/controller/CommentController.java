@@ -58,11 +58,16 @@ public class CommentController {
    
         Blog blogData = blogRepository.findById(blog).orElseThrow(() -> new NotFoundException("Blog id " + blog + " NotFound"));
        
-        comment.setBlogs_id(blogData.getId());
+        // comment.setBlogs_id(blogData.getId());
 
         try {
         
-            response.setData(commentRepository.save(comment));
+           response.setData(blogRepository.findById(blog).map(blogs -> {
+                comment.setBlogs_id(blogData.getId());
+                return commentRepository.save(comment);
+            }).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog)));
+
+            return new ResponseEntity<>(response ,HttpStatus.OK);
             
         } catch (Exception e) {
             response.setStatus(false);
@@ -72,7 +77,7 @@ public class CommentController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        // return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
 

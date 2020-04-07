@@ -1,7 +1,7 @@
 package com.blog.JavaSpringBoot.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javassist.NotFoundException;
@@ -19,7 +20,13 @@ import com.blog.JavaSpringBoot.repository.CategoriesRepository;
 import com.blog.JavaSpringBoot.service.CategoriesService;
 
 import javax.management.relation.RelationNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 
+import com.blog.JavaSpringBoot.common.MyPage;
+import com.blog.JavaSpringBoot.common.MyPageable;
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseCategoriesDTO;
+import com.blog.JavaSpringBoot.common.util.PageConverter;
 import com.blog.JavaSpringBoot.exeption.ResponseBase;
 
 
@@ -36,7 +43,7 @@ public class CategoriesController {
     @Autowired
     CategoriesService categoriesService;
 
-    @GetMapping()
+    @GetMapping("/getAll")
     public ResponseEntity<ResponseBase> getCategories() {
         ResponseBase response = new ResponseBase<>();
 
@@ -134,6 +141,34 @@ public class CategoriesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    
+    // ====================================================== With Pagination =====================================================
+
+    @GetMapping
+    public ResponseBaseDTO<MyPage<ResponseCategoriesDTO>> listCategories(
+        MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
+    ) { 
+        Page<ResponseCategoriesDTO> categories;
+
+        if (param != null) {
+            categories = categoriesService.findCategories(MyPageable.convertToPageable(pageable), param);
+        } else {
+            categories = categoriesService.findAll(MyPageable.convertToPageable(pageable));
+        }
+
+        PageConverter<ResponseCategoriesDTO> converter = new PageConverter<>();
+        String url = String.format("%s://%s:%d/categories",request.getScheme(),  request.getServerName(), request.getServerPort());
+
+        String search = "";
+
+        if(param != null){
+            search += "&param="+param;
+        }
+
+        MyPage<ResponseCategoriesDTO> response = converter.convert(categories, url, search);
+
+        return ResponseBaseDTO.ok(response);
+    }    
     
 
 }

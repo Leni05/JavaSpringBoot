@@ -6,14 +6,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * ResponseAuthorDTO
+ * ResponseCategoriesDTO
  */
 @Data
-public class ResponseAuthorDTO {
+public class ResponseCategoriesDTO {
     private Integer id;
-    private String first_name;
-    private String last_name;
-    private String username;
+    private String name;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")
     private Date created_at;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")

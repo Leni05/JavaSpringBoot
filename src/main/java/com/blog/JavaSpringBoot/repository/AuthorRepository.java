@@ -2,6 +2,7 @@ package com.blog.JavaSpringBoot.repository;
 
 
 import com.blog.JavaSpringBoot.model.Author;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,5 @@
 package com.blog.JavaSpringBoot.service;
 
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseAuthorDTO;
 import com.blog.JavaSpringBoot.common.util.DateTime;
 import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
@@ -35,7 +34,7 @@ public class Authorservice {
 
     public Author save(Author author) {
         author.setPassword(passwordEncoder().encode(author.getPassword()));
-        
+
         return authorRepository.save(author);
     }
 
@@ -55,11 +54,11 @@ public class Authorservice {
     @Autowired
     private DateTime dateTime;
 
-    private static final String RESOURCE = "Tags";
+    private static final String RESOURCE = "Authors";
     private static final String FIELD = "id";
 
 
-    public Page<ResponseAuthorDTO> findAll(Pageable pageable) {
+    public Page<Author> findAll(Pageable pageable) {
         try {
 
             return authorRepository.findAll(pageable).map(this::fromEntity);
@@ -71,7 +70,7 @@ public class Authorservice {
         }
     }
 
-    public Page<ResponseAuthorDTO> findAuthor(Pageable pageable, String param) {
+    public Page<Author> findAuthor(Pageable pageable, String param) {
 
         try {
             param = param.toLowerCase();
@@ -84,8 +83,8 @@ public class Authorservice {
         }
     }
 
-    private ResponseAuthorDTO fromEntity(Author authors) {
-        ResponseAuthorDTO response = new ResponseAuthorDTO();
+    private Author fromEntity(Author authors) {
+        Author response = new Author();
         BeanUtils.copyProperties(authors, response);
         return response;
     }
