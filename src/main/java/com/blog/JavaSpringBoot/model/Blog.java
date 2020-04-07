@@ -96,8 +96,9 @@ public class Blog implements Serializable {
     )    
     private List<Tags> tag = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "blogs_id", referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY,
+    mappedBy = "blog")
     private Set<Comment> comment;
 
 }

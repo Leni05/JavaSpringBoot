@@ -1,6 +1,7 @@
 package com.blog.JavaSpringBoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,12 +11,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.blog.JavaSpringBoot.common.MyPage;
+import com.blog.JavaSpringBoot.common.MyPageable;
+import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.common.util.PageConverter;
 import com.blog.JavaSpringBoot.exeption.ResourceNotFoundException;
 
 import javassist.NotFoundException;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.blog.JavaSpringBoot.exeption.ResponseBase;
 import com.blog.JavaSpringBoot.model.Blog;
@@ -39,19 +48,58 @@ public class CommentController {
     @Autowired
     private BlogRepository blogRepository;
 
-    @GetMapping("/{blog}/comments")
+    @GetMapping("/{blog}/commentsgetAll")
     public ResponseEntity<ResponseBase> getComment(@PathVariable Integer blog) {
         ResponseBase response = new ResponseBase<>();
 
-        List<Comment> comment = commentRepository.findCommentByBlogId(blog);
+        List<Comment> comment = commentRepository.findCommentByBlogIdone(blog);
 
         response.setData(comment);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+     //=================================================== With pagination ================================================
 
-    @PostMapping("/{blog}/comments")
+     @GetMapping("/{blog}/comments")
+     public ResponseBaseDTO<MyPage<Comment>> getALl(@PathVariable Integer blog,
+     MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
+ ) { 
+        try {
+          
+            Page<Comment> comments;
+ 
+        if (param != null) {
+            comments = commentService.findByEmail(MyPageable.convertToPageable(pageable), param);
+        } else {
+            comments = commentService.findAll(MyPageable.convertToPageable(pageable), blog);
+        }
+ 
+        PageConverter<Comment> converter = new PageConverter<>();
+        String url = null;
+    //  String.format("%s://%s:%d/posts/{blog}/comments",request.getScheme(),  request.getServerName(), request.getServerPort());
+
+        String search = "";
+
+        if(param != null){
+            search += "&param="+param;
+        }
+ 
+        MyPage<Comment> respon = converter.convert(comments, url, search);
+
+        return ResponseBaseDTO.ok(respon);
+        
+        } catch (Exception e) {
+
+            return ResponseBaseDTO.error("200", e.getMessage());
+        
+        }
+
+    }
+ 
+
+
+    @PostMapping("/{blog}/comments/")
     public ResponseEntity<ResponseBase> postComment(@PathVariable Integer blog, @RequestBody Comment comment)
             throws NotFoundException {
         ResponseBase response = new ResponseBase<>();
@@ -80,6 +128,35 @@ public class CommentController {
         // return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
+
+
+    @PostMapping("/{blog}/comments")
+    public ResponseEntity<ResponseBase> createBlogComment(@PathVariable Integer blog, @RequestBody Comment commentData) {
+        
+        ResponseBase response = new ResponseBase();
+
+        Blog blogData = blogRepository.findById(blog).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog));
+
+        try {
+
+            response.setData(blogRepository.findById(blogData.getId()).map(blogsData -> {
+                commentData.setBlog(blogsData);
+                return commentRepository.save(commentData);
+            }).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog)));
+
+            return new ResponseEntity<>(response ,HttpStatus.OK);
+
+        } catch (Exception e) {
+
+            response.setStatus(false);
+            response.setCode(500);
+            response.setMessage(e.getMessage() );
+
+            return new ResponseEntity<>(response, HttpStatus.EXPECTATION_FAILED);
+
+        }
+
+    }
 
     @GetMapping("/{blog}/comments/{id}")
     public ResponseEntity<ResponseBase> getCommentByIdAndBlogId( @PathVariable Integer blog, @PathVariable Integer id) throws NotFoundException {
@@ -139,5 +216,7 @@ public class CommentController {
         }
 
     }
+
+    //============================================= with pagination ===========================================================
     
 }
