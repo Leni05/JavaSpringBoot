@@ -76,8 +76,7 @@ public class CommentController {
         }
  
         PageConverter<Comment> converter = new PageConverter<>();
-        String url = null;
-    //  String.format("%s://%s:%d/posts/{blog}/comments",request.getScheme(),  request.getServerName(), request.getServerPort());
+        String url = String.format("%s://%s:%d/posts/"+blog+"/comments",request.getScheme(),  request.getServerName(), request.getServerPort());
 
         String search = "";
 
