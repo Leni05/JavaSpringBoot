@@ -70,7 +70,7 @@ public class CommentController {
             Page<Comment> comments;
  
         if (param != null) {
-            comments = commentService.findByEmail(MyPageable.convertToPageable(pageable), param);
+            comments = commentService.findByEmail(MyPageable.convertToPageable(pageable),blog, param);
         } else {
             comments = commentService.findAll(MyPageable.convertToPageable(pageable), blog);
         }

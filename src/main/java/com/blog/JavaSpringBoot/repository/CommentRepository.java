@@ -33,6 +33,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer>{
     @Query(value = "SELECT * from comment WHERE  comment.id = ?1 AND comment.blog_id = ?2", nativeQuery = true)
     Comment findByIdAndBlogId(Integer id, Integer blog);
 
-    @Query(value = "SELECT * from comment WHERE comment.guest_email like %:param%" ,nativeQuery = true )
-	Page<Comment> findByEmail(Pageable pageable, String param);
+    @Query(value = "SELECT * from comment WHERE blog_id = ?1 AND comment.guest_email like %?2% " ,nativeQuery = true )
+	Page<Comment> findByEmail(Pageable pageable, Integer blog, String param);
 }

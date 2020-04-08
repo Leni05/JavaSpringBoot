@@ -47,11 +47,11 @@ public class CommentService {
     }
 
 
-    public Page<Comment> findByEmail(Pageable pageable, String param) {
+    public Page<Comment> findByEmail(Pageable pageable,Integer blog, String param) {
 
         try {
             param = param.toLowerCase();
-            return commentRepository.findByEmail(pageable, param).map(this::fromEntity);
+            return commentRepository.findByEmail(pageable, blog, param).map(this::fromEntity);
 
         } catch (Exception e) {
 
