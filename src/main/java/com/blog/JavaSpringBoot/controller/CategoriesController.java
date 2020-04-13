@@ -21,13 +21,15 @@ import com.blog.JavaSpringBoot.service.CategoriesService;
 
 import javax.management.relation.RelationNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
-import com.blog.JavaSpringBoot.common.MyPage;
-import com.blog.JavaSpringBoot.common.MyPageable;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseCategoriesDTO;
-import com.blog.JavaSpringBoot.common.util.PageConverter;
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
+import com.blog.JavaSpringBoot.config.MyPage;
+import com.blog.JavaSpringBoot.config.MyPageable;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseCategoriesDTO;
+import com.blog.JavaSpringBoot.dto.request.RequestCategoriesDTO;
+import com.blog.JavaSpringBoot.util.PageConverter;
+import com.blog.JavaSpringBoot.exception.ResponseBase;
 
 
 /**
@@ -52,94 +54,94 @@ public class CategoriesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<ResponseBase> getCategoriesById(@PathVariable Integer id) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @GetMapping(value = "/{id}")
+    // public ResponseEntity<ResponseBase> getCategoriesById(@PathVariable Integer id) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+    //     Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
 
-        response.setData(categories);
+    //     response.setData(categories);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
-    @PostMapping()
-    public ResponseEntity<ResponseBase> postCategories(@RequestBody Categories categories) {
-        ResponseBase response = new ResponseBase<>();
+    // @PostMapping()
+    // public ResponseEntity<ResponseBase> postCategories(@RequestBody Categories categories) {
+    //     ResponseBase response = new ResponseBase<>();
 
-        try {
-            response.setData(categoriesRepository.save(categories));
+    //     try {
+    //         response.setData(categoriesRepository.save(categories));
             
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseBase> putCategories(@PathVariable Integer id, @RequestBody Categories categories) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @PutMapping("/{id}")
+    // public ResponseEntity<ResponseBase> putCategories(@PathVariable Integer id, @RequestBody Categories categories) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-        categoriesRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+    //     categoriesRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
 
-        try {
-            response.setData(categoriesService.update(id, categories));
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     try {
+    //         response.setData(categoriesService.update(id, categories));
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseBase> deleteCategories(@PathVariable Integer id) {
-        ResponseBase response = new ResponseBase<>();
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<ResponseBase> deleteCategories(@PathVariable Integer id) {
+    //     ResponseBase response = new ResponseBase<>();
 
-        try {
-            categoriesRepository.deleteById(id);
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     try {
+    //         categoriesRepository.deleteById(id);
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
-    @DeleteMapping()
-    public ResponseEntity<ResponseBase> deleteCategories(@RequestBody Categories categoriesData) throws NotFoundException {
+    // @DeleteMapping()
+    // public ResponseEntity<ResponseBase> deleteCategories(@RequestBody Categories categoriesData) throws NotFoundException {
         
-        ResponseBase response = new ResponseBase<>();
-        Categories category = categoriesRepository.findById(categoriesData.getId()).orElseThrow(() -> new NotFoundException("Categories id " + categoriesData.getId() + " NotFound"));
+    //     ResponseBase response = new ResponseBase<>();
+    //     Categories category = categoriesRepository.findById(categoriesData.getId()).orElseThrow(() -> new NotFoundException("Categories id " + categoriesData.getId() + " NotFound"));
 
-        try {
+    //     try {
 
-            //response.setData(categoriesRepository.deleteById(categoryId));
-            categoriesRepository.deleteById(category.getId());
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //         //response.setData(categoriesRepository.deleteById(categoryId));
+    //         categoriesRepository.deleteById(category.getId());
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
     
     // ====================================================== With Pagination =====================================================
@@ -151,7 +153,7 @@ public class CategoriesController {
         Page<ResponseCategoriesDTO> categories;
 
         if (param != null) {
-            categories = categoriesService.findCategories(MyPageable.convertToPageable(pageable), param);
+            categories = categoriesService.findByName(MyPageable.convertToPageable(pageable), param);
         } else {
             categories = categoriesService.findAll(MyPageable.convertToPageable(pageable));
         }
@@ -170,5 +172,29 @@ public class CategoriesController {
         return ResponseBaseDTO.ok(response);
     }    
     
+     
+    @PostMapping
+    public ResponseBaseDTO createCategories(@Valid @RequestBody RequestCategoriesDTO request) {
+        return ResponseBaseDTO.ok(categoriesService.save(request));
+    }
+
+    @PutMapping("{id}")
+    public ResponseBaseDTO updateCategories(
+         @Valid @RequestBody RequestCategoriesDTO request, @PathVariable("id") Integer id
+    ) {
+       categoriesService.update(id, request);
+       return ResponseBaseDTO.ok(categoriesService.update(id, request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseBaseDTO<ResponseCategoriesDTO> getOne(@PathVariable Integer id) {
+        return ResponseBaseDTO.ok(categoriesService.findById(id));
+    }
+
+    @DeleteMapping
+    public ResponseBaseDTO deleteCategories(@RequestBody Categories categories) {
+        
+       return ResponseBaseDTO.ok(categoriesService.deleteById(categories.getId()));
+    }
 
 }

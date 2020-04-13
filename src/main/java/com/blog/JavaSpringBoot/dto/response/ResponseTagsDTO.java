@@ -1,4 +1,4 @@
-package com.blog.JavaSpringBoot.common.ResponseDto;
+package com.blog.JavaSpringBoot.dto.response;
 
 import java.util.Date;
 

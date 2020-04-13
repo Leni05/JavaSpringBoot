@@ -19,6 +19,6 @@ public interface TagsRepository extends PagingAndSortingRepository<Tags, Integer
     Tags findByName(String name);
    
    	@Query("select e from #{#entityName} e where e.name like %:param% ")
-	Page<Tags> findByNameParams(Pageable pageable, String param);
+	Page<Tags> findByName(Pageable pageable, String param);
     
 }

@@ -4,67 +4,77 @@ package com.blog.JavaSpringBoot.service;
 import com.blog.JavaSpringBoot.model.Tags;
 import com.blog.JavaSpringBoot.repository.TagsRepository;
 
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseTagsDTO;
-import com.blog.JavaSpringBoot.common.util.DateTime;
-import org.springframework.beans.BeanUtils;
+import com.blog.JavaSpringBoot.exception.ResponseBase;
+import com.blog.JavaSpringBoot.dto.response.ResponseTagsDTO;
+import com.blog.JavaSpringBoot.dto.request.RequestTagsDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * TagServiceImpl
  */
-@Slf4j
-@Service
-public class TagsService {
+public interface TagsService {
 
-    @Autowired
-    private TagsRepository tagsRepository;
+    Page<ResponseTagsDTO> findAll(Pageable pageable);
 
-    @Autowired
-    private DateTime dateTime;
+    ResponseTagsDTO findById(Integer id);
 
-    private static final String RESOURCE = "Tags";
-    private static final String FIELD = "id";
+    Page<ResponseTagsDTO> findByName(Pageable pageable, String param);
 
-    public Tags update(Integer id, Tags tags) {
-        tags.setId(id);
+    // ResponseTagsDTO findByName(String name);
 
-        return tagsRepository.save(tags);
-    }
+    ResponseTagsDTO save(RequestTagsDTO request);
 
-    public Page<ResponseTagsDTO> findAll(Pageable pageable) {
-        try {
+    ResponseTagsDTO update(Integer id, RequestTagsDTO request);
 
-            return tagsRepository.findAll(pageable).map(this::fromEntity);
+    ResponseTagsDTO deleteById(Integer id);
+    
 
-        } catch (Exception e) {
+    // @Autowired
+    // private TagsRepository tagsRepository;
 
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
+    // @Autowired
+    // private DateTime dateTime;
 
-    public Page<ResponseTagsDTO> findByNameParams(Pageable pageable, String param) {
+    // private static final String RESOURCE = "Tags";
+    // private static final String FIELD = "id";
 
-        try {
-            param = param.toLowerCase();
-            return tagsRepository.findByNameParams(pageable, param).map(this::fromEntity);
+    // public Tags update(Integer id, Tags tags) {
+    //     tags.setId(id);
 
-        } catch (Exception e) {
+    //     return tagsRepository.save(tags);
+    // }
 
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
+    // public Page<ResponseTagsDTO> findAll(Pageable pageable) {
+    //     try {
 
-    private ResponseTagsDTO fromEntity(Tags tags) {
-        ResponseTagsDTO response = new ResponseTagsDTO();
-        BeanUtils.copyProperties(tags, response);
-        return response;
-    }
+    //         return tagsRepository.findAll(pageable).map(this::fromEntity);
+
+    //     } catch (Exception e) {
+
+    //         log.error(e.getMessage(), e);
+    //         throw e;
+    //     }
+    // }
+
+    // public Page<ResponseTagsDTO> findByNameParams(Pageable pageable, String param) {
+
+    //     try {
+    //         param = param.toLowerCase();
+    //         return tagsRepository.findByNameParams(pageable, param).map(this::fromEntity);
+
+    //     } catch (Exception e) {
+
+    //         log.error(e.getMessage(), e);
+    //         throw e;
+    //     }
+    // }
+
+    // private ResponseTagsDTO fromEntity(Tags tags) {
+    //     ResponseTagsDTO response = new ResponseTagsDTO();
+    //     BeanUtils.copyProperties(tags, response);
+    //     return response;
+    // }
 }

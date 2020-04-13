@@ -1,4 +1,4 @@
-package com.blog.JavaSpringBoot.exeption;
+package com.blog.JavaSpringBoot.exception;
 
 import lombok.Getter;
 import lombok.Setter;

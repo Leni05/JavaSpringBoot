@@ -1,6 +1,6 @@
-package com.blog.JavaSpringBoot.common.util;
+package com.blog.JavaSpringBoot.util;
 
-import com.blog.JavaSpringBoot.common.MyPage;
+import com.blog.JavaSpringBoot.config.MyPage;
 
 import org.springframework.data.domain.Page;
 

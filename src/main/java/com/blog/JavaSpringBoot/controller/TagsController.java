@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,14 +20,17 @@ import javassist.NotFoundException;
 import com.blog.JavaSpringBoot.model.Tags;
 import com.blog.JavaSpringBoot.repository.TagsRepository;
 import com.blog.JavaSpringBoot.service.TagsService;
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseTagsDTO;
-import com.blog.JavaSpringBoot.common.util.PageConverter;
+import com.blog.JavaSpringBoot.exception.ResponseBase;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseTagsDTO;
+import com.blog.JavaSpringBoot.dto.request.RequestTagsDTO;
+import com.blog.JavaSpringBoot.util.PageConverter;
 
 import javax.servlet.http.HttpServletRequest;
-import com.blog.JavaSpringBoot.common.MyPage;
-import com.blog.JavaSpringBoot.common.MyPageable;
+import javax.validation.Valid;
+
+import com.blog.JavaSpringBoot.config.MyPage;
+import com.blog.JavaSpringBoot.config.MyPageable;
 
 /**
  * TagsController
@@ -41,100 +45,100 @@ public class TagsController {
     @Autowired
     TagsService tagsService;
 
-    @GetMapping("/getAll")
-    public ResponseEntity<ResponseBase> getTags() {
-        ResponseBase response = new ResponseBase<>();
+    // @GetMapping("/getAll")
+    // public ResponseEntity<ResponseBase> getTags() {
+    //     ResponseBase response = new ResponseBase<>();
 
-        response.setData(tagsRepository.findAll());
+    //     response.setData(tagsRepository.findAll());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<ResponseBase> getTagsById(@PathVariable Integer id) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @GetMapping(value = "/{id}")
+    // public ResponseEntity<ResponseBase> getTagsById(@PathVariable Integer id) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-        Tags tags = tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+    //     Tags tags = tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
 
-        response.setData(tags);
+    //     response.setData(tags);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-    @PostMapping()
-    public ResponseEntity<ResponseBase> postTags(@RequestBody Tags tags) {
-        ResponseBase response = new ResponseBase<>();
+    // @PostMapping()
+    // public ResponseEntity<ResponseBase> postTags(@RequestBody Tags tags) {
+    //     ResponseBase response = new ResponseBase<>();
 
-        try {
-            response.setData(tagsRepository.save(tags));
+    //     try {
+    //         response.setData(tagsRepository.save(tags));
             
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseBase> putTags(@PathVariable Integer id, @RequestBody Tags tags) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
+    // @PutMapping("/{id}")
+    // public ResponseEntity<ResponseBase> putTags(@PathVariable Integer id, @RequestBody Tags tags) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-        tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
+    //     tagsRepository.findById(id).orElseThrow(() -> new NotFoundException("Categories id " + id + " NotFound"));
 
-        try {
-            response.setData(tagsService.update(id, tags));
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     try {
+    //         response.setData(tagsService.update(id, tags));
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
         
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseBase> deteleTags(@PathVariable Integer id) {
-        ResponseBase response = new ResponseBase<>();
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<ResponseBase> deteleTags(@PathVariable Integer id) {
+    //     ResponseBase response = new ResponseBase<>();
 
-        try {
-            tagsRepository.deleteById(id);
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    //     try {
+    //         tagsRepository.deleteById(id);
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-    @DeleteMapping()
-    public ResponseEntity<ResponseBase> deteleTagsById(@RequestBody Tags tags) throws NotFoundException {
-        ResponseBase response = new ResponseBase<>();
-
-        Tags tagss = tagsRepository.findById(tags.getId()).orElseThrow(() -> new NotFoundException("Categories id " + tags.getId() + " NotFound"));
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
 
-        try {
-            tagsRepository.deleteById(tagss.getId());
-        } catch (Exception e) {
-            response.setStatus(false);
-            response.setCode(500);
-            response.setMessage(e.getMessage());
+    // @DeleteMapping()
+    // public ResponseEntity<ResponseBase> deteleTagsById(@RequestBody Tags tags) throws NotFoundException {
+    //     ResponseBase response = new ResponseBase<>();
 
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    //     Tags tagss = tagsRepository.findById(tags.getId()).orElseThrow(() -> new NotFoundException("Categories id " + tags.getId() + " NotFound"));
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+
+    //     try {
+    //         tagsRepository.deleteById(tagss.getId());
+    //     } catch (Exception e) {
+    //         response.setStatus(false);
+    //         response.setCode(500);
+    //         response.setMessage(e.getMessage());
+
+    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
     // ====================================================== With Pagination =====================================================
 
@@ -146,7 +150,7 @@ public class TagsController {
        Page<ResponseTagsDTO> tags;
 
        if (param != null) {
-           tags = tagsService.findByNameParams(MyPageable.convertToPageable(pageable), param);
+           tags = tagsService.findByName(MyPageable.convertToPageable(pageable), param);
        } else {
            tags = tagsService.findAll(MyPageable.convertToPageable(pageable));
        }
@@ -165,4 +169,30 @@ public class TagsController {
        return ResponseBaseDTO.ok(response);
     }    
     
+    
+    @PostMapping
+    public ResponseBaseDTO createTags(@Valid @RequestBody RequestTagsDTO request) {
+        return ResponseBaseDTO.ok(tagsService.save(request));
+    }
+
+    @PutMapping("{id}")
+    public ResponseBaseDTO updateTag(
+         @Valid @RequestBody RequestTagsDTO request, @PathVariable("id") Integer id
+    ) {
+       tagsService.update(id, request);
+       return ResponseBaseDTO.ok(tagsService.update(id, request));
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseBaseDTO<ResponseTagsDTO> getOne(@PathVariable Integer id) {
+        return ResponseBaseDTO.ok(tagsService.findById(id));
+    }
+
+    @DeleteMapping
+    public ResponseBaseDTO deleteTag(@RequestBody Tags tag) {
+        
+       return ResponseBaseDTO.ok(tagsService.deleteById(tag.getId()));
+    }
+
 }

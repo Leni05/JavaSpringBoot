@@ -1,4 +1,4 @@
-package com.blog.JavaSpringBoot.common;
+package com.blog.JavaSpringBoot.config;
 
 import java.util.List;
 

@@ -1,19 +1,21 @@
-package com.blog.JavaSpringBoot.model.request;
+package com.blog.JavaSpringBoot.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 /**
- * AuthorDto
+ * RequestAuthorDTO
  */
-@Getter
-@Setter
-public class AuthorDto {
-
+@Data
+public class RequestAuthorDTO {
+    
     @Column(length = 45, nullable = false)
     @Size(min = 3, max = 45)
     private String first_name;
@@ -25,4 +27,8 @@ public class AuthorDto {
     @Column(length = 45, nullable = false, unique = true)
     @Size(min = 3, max = 45)
     private String username;
+
+    @Column(length = 150, nullable = false)
+    private String password;
+
 }

@@ -1,4 +1,4 @@
-package com.blog.JavaSpringBoot.common.util;
+package com.blog.JavaSpringBoot.util;
 
 
 import java.util.Date;

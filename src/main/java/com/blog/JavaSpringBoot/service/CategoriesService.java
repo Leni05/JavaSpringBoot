@@ -4,70 +4,78 @@ package com.blog.JavaSpringBoot.service;
 import com.blog.JavaSpringBoot.model.Categories;
 import com.blog.JavaSpringBoot.repository.CategoriesRepository;
 
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseCategoriesDTO;
-import com.blog.JavaSpringBoot.common.util.DateTime;
-import org.springframework.beans.BeanUtils;
+import com.blog.JavaSpringBoot.exception.ResponseBase;
+import com.blog.JavaSpringBoot.dto.response.ResponseCategoriesDTO;
+import com.blog.JavaSpringBoot.dto.request.RequestCategoriesDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
-import lombok.extern.slf4j.Slf4j;
 /**
  * CategoriesService
  */
-@Slf4j
-@Service
-public class CategoriesService {
-    @Autowired
-    CategoriesRepository categoriesRepository;
+public interface CategoriesService {
 
-    @Autowired
-    private DateTime dateTime;
+    Page<ResponseCategoriesDTO> findAll(Pageable pageable);
 
-    private static final String RESOURCE = "Authors";
-    private static final String FIELD = "id";
+    ResponseCategoriesDTO findById(Integer id);
+
+    Page<ResponseCategoriesDTO> findByName(Pageable pageable, String param);   
+
+    ResponseCategoriesDTO save(RequestCategoriesDTO request);
+
+    ResponseCategoriesDTO update(Integer id, RequestCategoriesDTO request);
+
+    ResponseCategoriesDTO deleteById(Integer id);
+
+     // ResponseTagsDTO findByName(String name);
+    // @Autowired
+    // CategoriesRepository categoriesRepository;
+
+    // @Autowired
+    // private DateTime dateTime;
+
+    // private static final String RESOURCE = "Authors";
+    // private static final String FIELD = "id";
 
 
-    public Categories update(Integer id, Categories categories) {
-        categories.setId(id);
+    // public Categories update(Integer id, Categories categories) {
+    //     categories.setId(id);
 
-        return categoriesRepository.save(categories);
-    }
+    //     return categoriesRepository.save(categories);
+    // }
 
-    public Page<ResponseCategoriesDTO> findAll(Pageable pageable) {
-        try {
+    // public Page<ResponseCategoriesDTO> findAll(Pageable pageable) {
+    //     try {
 
-            return categoriesRepository.findAll(pageable).map(this::fromEntity);
+    //         return categoriesRepository.findAll(pageable).map(this::fromEntity);
 
-        } catch (Exception e) {
+    //     } catch (Exception e) {
 
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
+    //         log.error(e.getMessage(), e);
+    //         throw e;
+    //     }
+    // }
 
-    public Page<ResponseCategoriesDTO> findCategories(Pageable pageable, String param) {
+    // public Page<ResponseCategoriesDTO> findCategories(Pageable pageable, String param) {
 
-        try {
-            param = param.toLowerCase();
-            return categoriesRepository.findCategories(pageable, param).map(this::fromEntity);
+    //     try {
+    //         param = param.toLowerCase();
+    //         return categoriesRepository.findCategories(pageable, param).map(this::fromEntity);
 
-        } catch (Exception e) {
+    //     } catch (Exception e) {
 
-            log.error(e.getMessage(), e);
-            throw e;
-        }
-    }
+    //         log.error(e.getMessage(), e);
+    //         throw e;
+    //     }
+    // }
 
-    private ResponseCategoriesDTO fromEntity(Categories categories) {
-        ResponseCategoriesDTO response = new ResponseCategoriesDTO();
-        BeanUtils.copyProperties(categories, response);
-        return response;
-    }
-
-   
+    // private ResponseCategoriesDTO fromEntity(Categories categories) {
+    //     ResponseCategoriesDTO response = new ResponseCategoriesDTO();
+    //     BeanUtils.copyProperties(categories, response);
+    //     return response;
+    // }  
 
     
 }

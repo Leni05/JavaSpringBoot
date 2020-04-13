@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.blog.JavaSpringBoot.common.MyPage;
-import com.blog.JavaSpringBoot.common.MyPageable;
-import com.blog.JavaSpringBoot.common.ResponseDto.ResponseBaseDTO;
-import com.blog.JavaSpringBoot.common.util.PageConverter;
-import com.blog.JavaSpringBoot.exeption.ResourceNotFoundException;
+import com.blog.JavaSpringBoot.config.MyPage;
+import com.blog.JavaSpringBoot.config.MyPageable;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.util.PageConverter;
+import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 
 import javassist.NotFoundException;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.blog.JavaSpringBoot.exeption.ResponseBase;
+import com.blog.JavaSpringBoot.exception.ResponseBase;
 import com.blog.JavaSpringBoot.model.Blog;
 import com.blog.JavaSpringBoot.model.Comment;
 import com.blog.JavaSpringBoot.repository.BlogRepository;
@@ -112,7 +112,7 @@ public class CommentController {
            response.setData(blogRepository.findById(blog).map(blogs -> {
                 comment.setBlogs_id(blogData.getId());
                 return commentRepository.save(comment);
-            }).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog)));
+            }).orElseThrow(() -> new NotFoundException("Blog id " + blog + " NotFound")));
 
             return new ResponseEntity<>(response ,HttpStatus.OK);
             
@@ -130,18 +130,18 @@ public class CommentController {
 
 
     @PostMapping("/{blog}/comments")
-    public ResponseEntity<ResponseBase> createBlogComment(@PathVariable Integer blog, @RequestBody Comment commentData) {
+    public ResponseEntity<ResponseBase> createBlogComment(@PathVariable Integer blog, @RequestBody Comment commentData) throws NotFoundException {
         
         ResponseBase response = new ResponseBase();
 
-        Blog blogData = blogRepository.findById(blog).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog));
+        Blog blogData = blogRepository.findById(blog).orElseThrow(() ->  new NotFoundException("Blog id " + blog + " NotFound"));
 
         try {
 
             response.setData(blogRepository.findById(blogData.getId()).map(blogsData -> {
                 commentData.setBlog(blogsData);
                 return commentRepository.save(commentData);
-            }).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog)));
+            }).orElseThrow(() -> new NotFoundException("Blog id " + blog + " NotFound")));
 
             return new ResponseEntity<>(response ,HttpStatus.OK);
 
@@ -161,7 +161,7 @@ public class CommentController {
     public ResponseEntity<ResponseBase> getCommentByIdAndBlogId( @PathVariable Integer blog, @PathVariable Integer id) throws NotFoundException {
         ResponseBase response = new ResponseBase<>();
 
-        Blog blogs = blogRepository.findById(blog).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog));
+        Blog blogs = blogRepository.findById(blog).orElseThrow(() ->new NotFoundException("Blog id " + blog + " NotFound"));
 
         Comment comment = commentRepository.findByIdAndBlogId(id, blog);
 
@@ -195,10 +195,10 @@ public class CommentController {
     // } 
 
     @DeleteMapping("/{blog}/comments")
-    public ResponseEntity<ResponseBase> deleteCommentRequest(@PathVariable Integer blog, @RequestBody Comment comments) {
+    public ResponseEntity<ResponseBase> deleteCommentRequest(@PathVariable Integer blog, @RequestBody Comment comments) throws NotFoundException {
         ResponseBase response = new ResponseBase<>();
 
-        Blog blogs = blogRepository.findById(blog).orElseThrow(() -> new ResourceNotFoundException("Blog", "id", blog));
+        Blog blogs = blogRepository.findById(blog).orElseThrow(() -> new NotFoundException("Blog id " + blog + " NotFound"));
        
         try {
 
