@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.blog.JavaSpringBoot.dto.request.RequestBlogDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestBlogUpdateDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseBlogDTO;
 import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
@@ -104,6 +105,38 @@ public class BlogServiceImpl implements BlogService {
         }
     }
 
+
+    @Override
+    public Page<ResponseBlogDTO> findByIdCategory(Pageable pageable, Integer categoryId) {
+        try {
+            return blogRepository.findByIdCategory(pageable, categoryId).map(this::fromEntity);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<ResponseBlogDTO> findByIdAuthor(Pageable pageable, Integer authorId) {
+        try {
+            return blogRepository.findByIdAuthor(pageable, authorId).map(this::fromEntity);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Page<ResponseBlogDTO> findByTag(Pageable pageable, String tagName) {
+        try {
+            return blogRepository.findByTag(pageable, tagName).map(this::fromEntity);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+    }
+
+
     @Override
     public ResponseBlogDTO save (RequestBlogDTO request) {
 
@@ -142,6 +175,8 @@ public class BlogServiceImpl implements BlogService {
             blogs.setAuthor((author));
             blogs.setCategories(categories);
             blogs.setTag(tags);
+            blogs.setTitle(request.getTitle());
+            blogs.setContent(request.getContent());
             blogs.setCreated_at(new Date());
             blogs.setUpdated_at(new Date());
 
@@ -156,17 +191,21 @@ public class BlogServiceImpl implements BlogService {
     }
     
     @Override
-    public ResponseBlogDTO update(Integer id, RequestBlogUpdateDTO request) {
+    public ResponseBaseDTO updateBlog(Integer id, RequestBlogUpdateDTO request) {
         try {
-            Blog blogs = blogRepository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE)
-            );   
+            Blog blogs = blogRepository.findByIdBlog(id);
+            
+            if( blogs == null) {
+                return ResponseBaseDTO.error("401", "Blog id : " + id +" not found");
+            }
             
             BeanUtils.copyProperties(request, blogs);
+            blogs.setTitle(request.getTitle());
+            blogs.setContent(request.getContent());
             blogs.setUpdated_at(new Date());
             blogRepository.save(blogs);
 
-            return fromEntity(blogs);
+            return ResponseBaseDTO.ok(this.fromEntity(blogs));
         } catch (ResourceNotFoundException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -175,6 +214,27 @@ public class BlogServiceImpl implements BlogService {
             throw e;
         }
     }
+
+
+    @Override
+    public void deleteById(Integer id) {
+
+        try {
+
+            Blog blog = blogRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE, FIELD, id.toString()));
+
+            blogRepository.deleteById(id);
+
+        } catch (Exception e) {
+
+            log.error(e.getMessage(), e);
+            throw e;
+
+        }
+    }
+
+
 
     private ResponseBlogDTO fromEntity(Blog blogs) {
         ResponseBlogDTO response = new ResponseBlogDTO();

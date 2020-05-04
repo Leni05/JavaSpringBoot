@@ -4,7 +4,11 @@ import com.blog.JavaSpringBoot.model.Blog;
 import com.blog.JavaSpringBoot.repository.BlogRepository;
 
 import com.blog.JavaSpringBoot.exception.ResponseBase;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseBlogDTO;
+
+import javax.validation.Valid;
+
 import com.blog.JavaSpringBoot.dto.request.RequestBlogDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestBlogUpdateDTO;
 
@@ -27,7 +31,16 @@ public interface BlogService {
 
     ResponseBlogDTO save(RequestBlogDTO request);
     
-    ResponseBlogDTO update(Integer id, RequestBlogUpdateDTO request);
+    ResponseBaseDTO updateBlog(Integer id, RequestBlogUpdateDTO request);
+
+    void deleteById(Integer id);
+
+    Page<ResponseBlogDTO> findByIdCategory(Pageable pageable, Integer categoryId);
+
+    Page<ResponseBlogDTO> findByIdAuthor(Pageable pageable, Integer authorId);
+
+    Page<ResponseBlogDTO> findByTag(Pageable pageable, String tagName);
+
     // @Autowired
     // private BlogRepository blogRepository;
 

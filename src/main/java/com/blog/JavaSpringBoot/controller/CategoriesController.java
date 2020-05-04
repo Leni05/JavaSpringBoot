@@ -196,5 +196,6 @@ public class CategoriesController {
         
        return ResponseBaseDTO.ok(categoriesService.deleteById(categories.getId()));
     }
+    
 
 }

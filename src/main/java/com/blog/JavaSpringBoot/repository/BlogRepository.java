@@ -15,9 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface BlogRepository extends PagingAndSortingRepository<Blog, Integer> {
     
-    @Query(
-     "select e from #{#entityName} e where e.title like %:param% OR "
-     + "e.content like %:param%"
-    )
+    @Query("select e from #{#entityName} e where e.title like %:param% ")
     Page<Blog> search(Pageable pageable, String param);    
+
+    @Query(value = "SELECT * from blog WHERE id = ?1", nativeQuery = true)
+    Blog findByIdBlog(Integer id);
+
+    @Query(value = "SELECT * from blog WHERE categories_id = ?1", nativeQuery = true)
+    Page<Blog> findByIdCategory(Pageable pageable, Integer categoryId);
+
+    @Query(value = "SELECT * from blog WHERE author_id = ?1", nativeQuery = true)
+    Page<Blog> findByIdAuthor(Pageable pageable, Integer authorId);
+
+    @Query(value = "select blog.* from blog join blog_tags on blog.id = blog_tags.blog_id "
+    +"join tags on tags.id = blog_tags.tags_id "
+    +"where tags.name like %:param%  ", nativeQuery = true)
+	Page<Blog> findByTag(Pageable pageable, String param);
+
 }

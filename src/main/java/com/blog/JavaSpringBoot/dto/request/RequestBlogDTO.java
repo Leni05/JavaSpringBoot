@@ -22,7 +22,7 @@ public class RequestBlogDTO {
 
     private Integer categories_id;
 
-    private transient List<String> tags_name;
+    private List<String> tags_name;
 
     @NotNull
     @NotBlank

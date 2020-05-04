@@ -67,12 +67,12 @@ public class Blog implements Serializable {
     @NotBlank
     private String content;
 
-    @Lob
-    @Column(name="image")
-    private byte[] image;
+    // @Lob
+    // @Column(name="image")
+    // private byte[] image;
 
-    @Column(name="image_url")
-    private String imageUrl;
+    // @Column(name="image_url")
+    // private String imageUrl;
 
     @Column(updatable = false)
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")

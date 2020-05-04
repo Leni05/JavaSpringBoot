@@ -31,6 +31,7 @@ import com.blog.JavaSpringBoot.exception.ResponseBase;
 import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseBlogDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestBlogDTO;
+import com.blog.JavaSpringBoot.dto.request.RequestBlogUpdateDTO;
 import com.blog.JavaSpringBoot.util.PageConverter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -180,25 +181,38 @@ public class BlogController {
     //=============================================== With Pagination ======================================================
     @GetMapping
     public ResponseBaseDTO<MyPage<ResponseBlogDTO>> getALl(
-        MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
+        MyPageable pageable, @RequestParam(required = false) String title,  @RequestParam(required = false) Integer author_id, 
+        @RequestParam(required = false) Integer category_id, @RequestParam(required = false) String tagName,
+        HttpServletRequest request
     ) {
         Page<ResponseBlogDTO> blogs;
 
-       if (param != null) {
-           blogs = blogService.findByName(MyPageable.convertToPageable(pageable), param);
-       } else {
-           blogs = blogService.findAll(MyPageable.convertToPageable(pageable));
-       }
+        if (title != null) {
+            blogs = blogService.findByName(MyPageable.convertToPageable(pageable), title);
+        } else if(author_id != null ){
+            blogs = blogService.findByIdAuthor(MyPageable.convertToPageable(pageable), author_id);
+        } else if(category_id != null) {
+            blogs = blogService.findByIdCategory(MyPageable.convertToPageable(pageable), category_id);
+        } else if(tagName != null) {
+            blogs = blogService.findByTag(MyPageable.convertToPageable(pageable), tagName);
+        }else {
+            blogs = blogService.findAll(MyPageable.convertToPageable(pageable));
+        }
 
        PageConverter<ResponseBlogDTO> converter = new PageConverter<>();
-       String url = String.format("%s://%s:%d/blogs",request.getScheme(),  request.getServerName(), request.getServerPort());
+       String url = String.format("%s://%s:%d/posts",request.getScheme(),  request.getServerName(), request.getServerPort());
 
        String search = "";
 
-       if(param != null){
-           search += "&param="+param;
-       }
-
+        if(title != null){
+            search += "&param="+title;
+        } else if ( author_id != null ){
+            search += "&param="+author_id;
+        } else if( category_id != null ){
+            search += "&param="+category_id;
+        }else if( tagName != null ){
+            search += "&param="+tagName;
+        }
        MyPage<ResponseBlogDTO> response = converter.convert(blogs, url, search);
 
        return ResponseBaseDTO.ok(response);
@@ -216,5 +230,32 @@ public class BlogController {
        
         return ResponseBaseDTO.ok(blogService.save(request));
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity updateBlog(@Valid @RequestBody RequestBlogUpdateDTO request, @PathVariable("id") Integer id
+    ) {
+        ResponseBaseDTO  response = this.blogService.updateBlog(id, request);
+        if (response.getCode() != "200"){
+            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST );
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping
+    public ResponseBaseDTO deleteBlog(@RequestBody Blog blog) {
+        try {
+
+            blogService.deleteById(blog.getId());
+
+            return ResponseBaseDTO.ok();
+
+        } catch (Exception e) {
+
+            return ResponseBaseDTO.error("400", "blog id : " + blog.getId() + " not found");
+
+        }
+    }
+
     
 }

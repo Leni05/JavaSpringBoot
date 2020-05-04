@@ -19,7 +19,8 @@ import lombok.Data;
 public class ResponseBlogDTO {
 
     private Integer id;    
-    private String name;
+    private String title; 
+    private String content;
     private Author author;
     private Categories categories;
     

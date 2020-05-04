@@ -24,6 +24,9 @@ public interface AuthorRepository extends PagingAndSortingRepository<Author, Int
         "select e from #{#entityName} e where e.first_name like %:param% OR "
         + "e.last_name like %:param% OR e.username like %:param%"
        )
-	Page<Author> findAuthor(Pageable pageable, String param);
+        Page<Author> findAuthor(Pageable pageable, String param);
+        
+        @Query(value = "SELECT * from author WHERE username = ?1", nativeQuery = true)
+        Author getUserByUsername(String username);
     
 }

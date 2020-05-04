@@ -42,7 +42,7 @@ public class Comment implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private transient Integer blogs_id;
+    private transient Integer blog_id;
 
     @Column(length = 100)
     @Size(min = 10, max = 100)

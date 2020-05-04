@@ -15,8 +15,8 @@ import lombok.Data;
 public class ResponseCommentDTO {
     private Integer id;      
     private String guest_email;
-    private String content;  
-    private Blog blog;
+    private String content;   
+    private Integer blog_id;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")
     private Date created_at;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")

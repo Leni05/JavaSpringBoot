@@ -1,7 +1,12 @@
 package com.blog.JavaSpringBoot.service.impl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.sql.DataSource;
+
+// import com.blog.JavaSpringBoot.config.ResourceServerConfig;
 import com.blog.JavaSpringBoot.dto.request.RequestAuthorDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestAuthorPasswordDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestAuthorUpdateDTO;
@@ -20,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,9 +39,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class AuthorServiceImpl implements Authorservice {
-    
+
     @Autowired
     private AuthorRepository authorRepository;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -45,11 +56,12 @@ public class AuthorServiceImpl implements Authorservice {
 
     private static final String RESOURCE = "Author";
     private static final String FIELD = "id";
-
+    
     @Override
     public ResponseAuthorDTO deleteById(Integer id) {
         try {
-            Author author = authorRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+            Author author = authorRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
             authorRepository.deleteById(id);
 
             return fromEntity(author);
@@ -70,12 +82,12 @@ public class AuthorServiceImpl implements Authorservice {
         }
     }
 
-  
     @Override
     public ResponseAuthorDTO findById(Integer id) {
         try {
-            Author author = authorRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
-            
+            Author author = authorRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+
             return fromEntity(author);
         } catch (ResourceNotFoundException e) {
             log.error(e.getMessage(), e);
@@ -109,7 +121,6 @@ public class AuthorServiceImpl implements Authorservice {
             author.setCreated_at(new Date());
             author.setUpdated_at(new Date());
 
-            
             authorRepository.save(author);
             return fromEntity(author);
 
@@ -122,10 +133,9 @@ public class AuthorServiceImpl implements Authorservice {
     @Override
     public ResponseAuthorUpdateDTO update(Integer id, RequestAuthorUpdateDTO request) {
         try {
-            Author author = authorRepository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE)
-            );   
-            
+            Author author = authorRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+
             BeanUtils.copyProperties(request, author);
             author.setUpdated_at(new Date());
             authorRepository.save(author);
@@ -142,12 +152,11 @@ public class AuthorServiceImpl implements Authorservice {
 
     @Override
     public ResponseAuthorPasswordDTO updatePass(Integer id, RequestAuthorPasswordDTO request) {
-        
+
         try {
-            Author authors = authorRepository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE)
-            );   
-            
+            Author authors = authorRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+
             BeanUtils.copyProperties(request, authors);
             authors.setPassword(passwordEncoder().encode(request.getPassword()));
             authors.setUpdated_at(new Date());
@@ -161,9 +170,8 @@ public class AuthorServiceImpl implements Authorservice {
             log.error(e.getMessage(), e);
             throw e;
         }
-           
+
     }
-    
 
     private ResponseAuthorDTO fromEntity(Author autuhor) {
         ResponseAuthorDTO response = new ResponseAuthorDTO();
@@ -182,4 +190,15 @@ public class AuthorServiceImpl implements Authorservice {
         BeanUtils.copyProperties(autuhor, response);
         return response;
     }
+
+    @Override
+    public Author getByUsername(String username) {
+        try {
+            return authorRepository.getUserByUsername(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

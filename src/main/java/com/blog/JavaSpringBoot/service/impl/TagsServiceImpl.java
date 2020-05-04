@@ -104,8 +104,7 @@ public class TagsServiceImpl implements TagsService {
             tags.setName(request.getName());
             tags.setCreated_at(new Date());
             tags.setUpdated_at(new Date());
-
-            
+                        
             tagsRepository.save(tags);
             return fromEntity(tags);
 
@@ -114,6 +113,7 @@ public class TagsServiceImpl implements TagsService {
             throw e;
         }
     }
+    
     @Override
     public ResponseTagsDTO update(Integer id, RequestTagsDTO request) {
         try {
