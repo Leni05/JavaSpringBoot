@@ -72,7 +72,9 @@ public class ServerSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .authorizeRequests()
                 .antMatchers("/api/login").permitAll()
-            
+            // .and()
+            //     .authorizeRequests()
+            //     .antMatchers("/tags/**").permitAll()
              .and()
                 .authorizeRequests()
                 .antMatchers("/api/mobile/hello-mobile").permitAll()   

@@ -31,4 +31,6 @@ public class RequestAuthorDTO {
     @Column(length = 150, nullable = false)
     private String password;
 
+    private Integer roles_id;
+
 }

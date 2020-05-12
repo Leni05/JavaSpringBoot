@@ -1,5 +1,6 @@
 package com.blog.JavaSpringBoot.model;
 
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,47 +23,38 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Author
+ * Role
  */
 @Entity
-@Table(name = "author")
+@Table(name = "roles")
 @Getter
 @Setter
 @ToString
-public class Author implements Serializable {
+
+public class Roles implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
+
     private Integer id;
 
-    @Column(length = 45, nullable = false)
-    @Size(min = 3, max = 45)
+    @Column(length = 20, nullable = false, unique = true, updatable = true)
+    @Size(min = 2, max = 20)
     @NotBlank
-    private String first_name;
+    private String name;
 
-    @Column(length = 45)
-    @Size(min = 3, max = 45)
-    private String last_name;
-
-    @Column(length = 45, nullable = false, unique = true)
-    @Size(min = 3, max = 45)
+    @Column(length = 20, nullable = false, unique = true, updatable = true)
+    @Size(min = 2, max = 50)
     @NotBlank
-    private String username;
-
-    @Column(length = 150, nullable = false)
-    @NotBlank
-    private String password;
+    private String description;
 
     @Column(updatable = false)
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+7")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")
     @CreationTimestamp
     private Date created_at;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+7")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")
     @UpdateTimestamp
     private Date updated_at;
 
-    @Column(name="roles_id")
-    private Integer roles_id;
 }

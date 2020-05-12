@@ -70,7 +70,6 @@ import com.blog.JavaSpringBoot.config.MyPageable;
  * AuthorController
  */
 @RestController
-@RequestMapping("/authors")
 public class AuthorController {
 
     @Autowired
@@ -94,134 +93,9 @@ public class AuthorController {
 	private AuthenticationManager authenticationManager;
 
 
-    // @GetMapping("getAll")
-    // public ResponseEntity<ResponseBase> getAuthor() {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     response.setData(authorRepository.findAll());
-
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-    // @GetMapping(value = "/{id}")
-    // public ResponseEntity<ResponseBase> getAuthorById(@PathVariable Integer id) throws NotFoundException {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     Author author = authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author id " + id + " NotFound"));
-
-    //     // author.setPassword(passwordEncoder().encode(author.getPassword()));
-    //     response.setData(author);
-
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-    // @PostMapping()
-    // public ResponseEntity<ResponseBase> postAuthors(@RequestBody Author author) {
-    //     ResponseBase response = new ResponseBase();
-
-    //     try {
-            
-    //         response.setData(authorService.save(author));
-
-    //         return new ResponseEntity<>(response ,HttpStatus.OK);
-
-    //     } catch (Exception e) {
-
-    //         response.setStatus(false);
-    //         response.setCode(500);
-    //         response.setMessage(e.getMessage() + "opppppp");
-
-    //         return new ResponseEntity<>(response, HttpStatus.EXPECTATION_FAILED);
-
-    //     }
-
-    // }
-
-
-    // @PutMapping("/{id}")
-    // public ResponseEntity<ResponseBase> putAuthor(@PathVariable Integer id, @RequestBody AuthorDto authorDto) throws NotFoundException {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     Author author = authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author id " + id + " NotFound"));
-
-    //     try {
-    //         author.setFirst_name(authorDto.getFirst_name());
-    //         author.setLast_name(authorDto.getLast_name());
-    //         author.setUsername(authorDto.getUsername());
-
-    //         response.setData(authorService.update(id, author));
-    //     } catch (Exception e) {
-    //         response.setStatus(false);
-    //         response.setCode(500);
-    //         response.setMessage(e.getMessage());
-
-    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-        
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-    // @DeleteMapping("/{id}")
-    // public ResponseEntity<ResponseBase> deleteAuthor(@PathVariable Integer id) {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     try {
-    //         authorRepository.deleteById(id);
-    //     } catch (Exception e) {
-    //         response.setStatus(false);
-    //         response.setCode(500);
-    //         response.setMessage(e.getMessage());
-
-    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-    
-
-    // @PutMapping("/{id}/password")
-    // public ResponseEntity<ResponseBase> putPaswordAuthor(@PathVariable Integer id, @RequestBody AuthorPasswordDto authorPasswordDto) throws NotFoundException {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     Author author = authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author id " + id + " NotFound"));
-
-    //     try {
-    //         author.setPassword(authorPasswordDto.getPassword());
-
-    //         response.setData(authorService.changePassword(id, author));
-    //     } catch (Exception e) {
-    //         response.setStatus(false);
-    //         response.setCode(500);
-    //         response.setMessage(e.getMessage());
-
-    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-        
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
-    // @DeleteMapping()
-    // public ResponseEntity<ResponseBase> deleteAuthorById(@RequestBody Author author) throws NotFoundException {
-    //     ResponseBase response = new ResponseBase<>();
-
-    //     Author authors = authorRepository.findById(author.getId()).orElseThrow(() -> new NotFoundException("Author id " + author.getId() + " NotFound"));
-
-    //     try {
-    //         authorRepository.deleteById(authors.getId());
-    //     } catch (Exception e) {
-    //         response.setStatus(false);
-    //         response.setCode(500);
-    //         response.setMessage(e.getMessage());
-
-    //         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-
-    //     return new ResponseEntity<>(response, HttpStatus.OK);
-    // }
-
     //=================================================== With pagination ================================================
 
-    @GetMapping
+    @GetMapping("/authors")
     public ResponseBaseDTO<MyPage<ResponseAuthorDTO>> listAuthor(
         MyPageable pageable, @RequestParam(required = false) String param, HttpServletRequest request
     ) { 
@@ -248,17 +122,17 @@ public class AuthorController {
 
     }
 
-    @PostMapping
+    @PostMapping("/authors")
     public ResponseBaseDTO createAuthor(@Valid @RequestBody RequestAuthorDTO request) {
         return ResponseBaseDTO.ok(authorService.save(request));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/authors/{id}")
     public ResponseBaseDTO<ResponseAuthorDTO> getOne(@PathVariable Integer id) {
         return ResponseBaseDTO.ok(authorService.findById(id));
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/authors/{id}")
     public ResponseBaseDTO updateAuthor(
          @Valid @RequestBody RequestAuthorUpdateDTO request, @PathVariable("id") Integer id
     ) {
@@ -266,7 +140,7 @@ public class AuthorController {
        return ResponseBaseDTO.ok(authorService.update(id, request));
     }
 
-    @PutMapping("{id}/password")
+    @PutMapping("/authors/{id}/password")
     public ResponseBaseDTO updateAuthorPass(
          @Valid @RequestBody RequestAuthorPasswordDTO request, @PathVariable("id") Integer id
     ) {
@@ -274,22 +148,25 @@ public class AuthorController {
        return ResponseBaseDTO.ok(authorService.updatePass(id, request));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/authors")
     public ResponseBaseDTO deleteTag(@RequestBody Author author) {
         
        return ResponseBaseDTO.ok(authorService.deleteById(author.getId()));
     }
 
 
-      //Normal Login
-	@RequestMapping(value="/api/login", method = RequestMethod.POST)
+    //Normal Login
+    @RequestMapping(value="/api/login", method = RequestMethod.POST)
+
 	public  ResponseEntity<ResponseOauthDTO> login(@RequestParam HashMap<String, String> params) throws Exception
 	{
+        // System.out.println("masukkkkk loginn");
 		ResponseOauthDTO response = new ResponseOauthDTO();
 		Author checkUser =  authorService.getByUsername(params.get("username"));
 
 	    if (checkUser != null)
 		{
+            // System.out.println("masukkkkk sini");
 			try {
 				OAuth2AccessToken token = this.getToken(params);
 			
@@ -306,6 +183,7 @@ public class AuthorController {
                     response.setMessage(exception.getMessage());
 			}
 		} else {
+            // System.out.println("masukkkkk catch");
 			throw new Exception();
 		}
 		

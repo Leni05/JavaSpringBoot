@@ -16,7 +16,9 @@ import com.blog.JavaSpringBoot.dto.response.ResponseAuthorUpdateDTO;
 import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
+import com.blog.JavaSpringBoot.repository.RolesRepository;
 import com.blog.JavaSpringBoot.model.Author;
+import com.blog.JavaSpringBoot.model.Roles;
 import com.blog.JavaSpringBoot.service.Authorservice;
 import com.blog.JavaSpringBoot.util.DateTime;
 
@@ -42,6 +44,9 @@ public class AuthorServiceImpl implements Authorservice {
 
     @Autowired
     private AuthorRepository authorRepository;
+
+    @Autowired
+    private RolesRepository rolesRepository;
 
     @Autowired
     private DataSource dataSource;
@@ -113,7 +118,11 @@ public class AuthorServiceImpl implements Authorservice {
     public ResponseAuthorDTO save(RequestAuthorDTO request) {
         try {
             Author author = new Author();
-
+            Roles roles =  rolesRepository.findById(request.getRoles_id()).orElseThrow(
+                ()->new ResourceNotFoundException(request.getRoles_id().toString(), FIELD, RESOURCE)
+            );   
+ 
+            author.setRoles_id(roles.getId());
             author.setFirst_name(request.getFirst_name());
             author.setLast_name(request.getLast_name());
             author.setUsername(request.getUsername());

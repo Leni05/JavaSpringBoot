@@ -27,6 +27,7 @@ public class RequestAuthorUpdateDTO {
     @Column(length = 45, nullable = false, unique = true)
     @Size(min = 3, max = 45)
     private String username;
-
+    
+    private Integer roles_id;
 
 }
