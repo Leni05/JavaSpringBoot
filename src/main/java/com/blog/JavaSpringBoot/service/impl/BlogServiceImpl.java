@@ -8,6 +8,7 @@ import com.blog.JavaSpringBoot.dto.request.RequestBlogDTO;
 import com.blog.JavaSpringBoot.dto.request.RequestBlogUpdateDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseBlogDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseDataDTO;
 import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
 import com.blog.JavaSpringBoot.repository.BlogRepository;
@@ -25,6 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -138,14 +143,32 @@ public class BlogServiceImpl implements BlogService {
 
 
     @Override
-    public ResponseBlogDTO save (RequestBlogDTO request) {
+    public ResponseEntity save (RequestBlogDTO request) {
 
-        Author author = authorRepository.findById(request.getAuthor_id()).orElseThrow(
-            ()->new ResourceNotFoundException(request.getAuthor_id().toString(), FIELD, RESOURCE)
-        );   
-        Categories categories = categoriesRepository.findById(request.getCategories_id()).orElseThrow(
-            ()->new ResourceNotFoundException(request.getCategories_id().toString(), FIELD, RESOURCE)
-        );   
+        ResponseDataDTO<ResponseBlogDTO> responseData = new ResponseDataDTO<>();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+        Author roleLogin = authorRepository.findByUsername(auth.getName());
+
+        Author author = authorRepository.getById(request.getAuthor_id());
+        Categories categories = categoriesRepository.getById(request.getCategories_id());
+
+        if( author == null ) {
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "data author tidak ditemukan", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
+        if( categories == null ) {
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "data categories tidak ditemukan", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
+        if( roleLogin.getId() != author.getId() ){
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "hanya bisa create author diri sendiri", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
+      
       
         List<String> tagtag = request.getTags_name();
         ArrayList<Tags> tags = new ArrayList<Tags>();
@@ -179,57 +202,123 @@ public class BlogServiceImpl implements BlogService {
             blogs.setContent(request.getContent());
             blogs.setCreated_at(new Date());
             blogs.setUpdated_at(new Date());
-
             blogRepository.save(blogs);
-            return fromEntity(blogs);
+
+            ResponseBlogDTO response = new ResponseBlogDTO() ;
+            response.setAuthor(blogs.getAuthor());
+            response.setCategories(blogs.getCategories());
+            response.setTag(blogs.getTag());
+            response.setTitle(blogs.getTitle());
+            response.setContent(blogs.getContent());
+            response.setCreated_at(blogs.getCreated_at());
+            response.setUpdated_at(blogs.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
+          
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "save data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }        
       
     }
     
     @Override
-    public ResponseBaseDTO updateBlog(Integer id, RequestBlogUpdateDTO request) {
-        try {
-            Blog blogs = blogRepository.findByIdBlog(id);
-            
-            if( blogs == null) {
-                return ResponseBaseDTO.error("401", "Blog id : " + id +" not found");
-            }
-            
+    public ResponseEntity updateBlog(Integer id, RequestBlogUpdateDTO request) {
+
+        ResponseDataDTO<ResponseBlogDTO> responseData = new ResponseDataDTO<>();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+        Author roleLogin = authorRepository.findByUsername(auth.getName());
+        Blog blogs = blogRepository.getById(id);
+
+        Author authorData = authorRepository.getByIdBlog(id);
+
+        System.out.println("masuk id blogss  : "+ blogs + "id request : " +id);
+
+        if( blogs == null) {
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "data blog tidak ditemukan", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
+        if( roleLogin.getId() != authorData.getId() ){
+
+            System.out.println("role : " + roleLogin.getId()+ "get author blog : "+blogs.getAuthor_id() + "author : " + authorData.getId());
+
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "hanya bisa update blog diri sendiri", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+        
+        try {           
+           
             BeanUtils.copyProperties(request, blogs);
             blogs.setTitle(request.getTitle());
             blogs.setContent(request.getContent());
             blogs.setUpdated_at(new Date());
             blogRepository.save(blogs);
 
-            return ResponseBaseDTO.ok(this.fromEntity(blogs));
-        } catch (ResourceNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            ResponseBlogDTO response = new ResponseBlogDTO() ;
+            response.setAuthor(blogs.getAuthor());
+            response.setCategories(blogs.getCategories());
+            response.setTag(blogs.getTag());
+            response.setTitle(blogs.getTitle());
+            response.setContent(blogs.getContent());
+            response.setCreated_at(blogs.getCreated_at());
+            response.setUpdated_at(blogs.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "gagal update data", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 
 
     @Override
-    public void deleteById(Integer id) {
+    public ResponseEntity deleteById(Integer id) {
+        ResponseDataDTO<ResponseBlogDTO> responseData = new ResponseDataDTO<>();
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication(); 
+        Author roleLogin = authorRepository.findByUsername(auth.getName());
+
+        Blog blogs = blogRepository.getById(id);
+
+        Author authorData = authorRepository.getByIdBlog(id);
+        System.out.println("masuk id blogss  : "+ blogs + "id request : " +id);
+        if( blogs == null) {
+            System.out.println("masuk null");
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "data blog tidak ditemukan", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
+        if( roleLogin.getId() != authorData.getId() ){
+            System.out.println("role : " + roleLogin.getId() + "author : " + blogs.getAuthor_id());
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "hanya bisa delete blog diri sendiri", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
         try {
 
-            Blog blog = blogRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE, FIELD, id.toString()));
+            // Blog blog = blogRepository.findById(id)
+            //         .orElseThrow(() -> new ResourceNotFoundException(RESOURCE, FIELD, id.toString()));
 
-            blogRepository.deleteById(id);
+            ResponseBlogDTO response = new ResponseBlogDTO() ;
+            response.setAuthor(blogs.getAuthor());
+            response.setCategories(blogs.getCategories());
+            response.setTag(blogs.getTag());
+            response.setTitle(blogs.getTitle());
+            response.setContent(blogs.getContent());
+            response.setCreated_at(blogs.getCreated_at());
+            response.setUpdated_at(blogs.getUpdated_at());
+
+            blogRepository.deleteById(id);            
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
-
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseBlogDTO>(false, 404, "gagal update data", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
 
         }
     }

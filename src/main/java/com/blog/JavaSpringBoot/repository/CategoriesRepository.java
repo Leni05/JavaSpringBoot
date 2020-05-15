@@ -24,6 +24,9 @@ public interface CategoriesRepository extends PagingAndSortingRepository<Categor
    
 	@Query("select e from #{#entityName} e where e.name like %:param% ")
 	Page<Categories> findCategories(Pageable pageable, String param);
-    
+	
+	
+	@Query(value = "SELECT * from categories WHERE id = ?1", nativeQuery = true)
+	Categories getById(Integer id);
 
 }

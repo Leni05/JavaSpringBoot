@@ -225,36 +225,44 @@ public class BlogController {
     }
 
       
-    @PostMapping
-    public ResponseBaseDTO createBlog(@Valid @RequestBody RequestBlogDTO request) {
+    // @PostMapping
+    // public ResponseBaseDTO createBlog(@Valid @RequestBody RequestBlogDTO request) {
        
-        return ResponseBaseDTO.ok(blogService.save(request));
+    //     return ResponseBaseDTO.ok(blogService.save(request));
+    // }
+
+    @PostMapping
+    public ResponseEntity createBlog(@Valid @RequestBody RequestBlogDTO request) {
+        return blogService.save(request);
     }
 
     @PutMapping("{id}")
     public ResponseEntity updateBlog(@Valid @RequestBody RequestBlogUpdateDTO request, @PathVariable("id") Integer id
     ) {
-        ResponseBaseDTO  response = this.blogService.updateBlog(id, request);
-        if (response.getCode() != "200"){
-            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST );
-        }
+        // ResponseBaseDTO  response = this.blogService.updateBlog(id, request);
+        // if (response.getCode() != "200"){
+        //     return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST );
+        // }
 
-        return ResponseEntity.ok(response);
+        return blogService.updateBlog(id, request);
     }
 
     @DeleteMapping
-    public ResponseBaseDTO deleteBlog(@RequestBody Blog blog) {
-        try {
+    // public ResponseBaseDTO deleteBlog(@RequestBody Blog blog) {
+    //     try {
 
-            blogService.deleteById(blog.getId());
+    //         blogService.deleteById(blog.getId());
 
-            return ResponseBaseDTO.ok();
+    //         return ResponseBaseDTO.ok();
 
-        } catch (Exception e) {
+    //     } catch (Exception e) {
 
-            return ResponseBaseDTO.error("400", "blog id : " + blog.getId() + " not found");
+    //         return ResponseBaseDTO.error("400", "blog id : " + blog.getId() + " not found");
 
-        }
+    //     }
+    // }
+    public ResponseEntity deleteBlog(@RequestBody Blog request) {
+        return blogService.deleteById(request.getId());
     }
 
     

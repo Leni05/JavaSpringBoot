@@ -13,6 +13,8 @@ import com.blog.JavaSpringBoot.dto.request.RequestAuthorUpdateDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseAuthorDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseAuthorPasswordDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseAuthorUpdateDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseDataDTO;
 import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
@@ -27,8 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -115,13 +120,33 @@ public class AuthorServiceImpl implements Authorservice {
     }
 
     @Override
-    public ResponseAuthorDTO save(RequestAuthorDTO request) {
+    public ResponseEntity save(RequestAuthorDTO request) {
+        ResponseDataDTO<ResponseAuthorDTO> responseData = new ResponseDataDTO<>();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Author roleLogin = (Author) auth.getPrincipal();      
+        Author roleLogin = authorRepository.findByUsername(auth.getName());
+        System.out.println("masukkkkk" + roleLogin.getRoles_id());
+
         try {
             Author author = new Author();
-            Roles roles =  rolesRepository.findById(request.getRoles_id()).orElseThrow(
-                ()->new ResourceNotFoundException(request.getRoles_id().toString(), FIELD, RESOURCE)
-            );   
- 
+            Roles roles =  rolesRepository.findByIdRoles(request.getRoles_id());
+
+          
+            if(roleLogin.getRoles_id() != 1 ) {
+                System.out.println("login" + roleLogin.getRoles_id());
+
+                responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "Hanya Admin yang bisa akses", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            } 
+            if(roles == null ){
+                System.out.println("roles" + roleLogin.getRoles_id());
+
+                responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "role id tidak ditemukan", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }    
+            System.out.println("save data" + roleLogin.getRoles_id());
+
             author.setRoles_id(roles.getId());
             author.setFirst_name(request.getFirst_name());
             author.setLast_name(request.getLast_name());
@@ -129,13 +154,22 @@ public class AuthorServiceImpl implements Authorservice {
             author.setPassword(passwordEncoder().encode(request.getPassword()));
             author.setCreated_at(new Date());
             author.setUpdated_at(new Date());
-
             authorRepository.save(author);
-            return fromEntity(author);
+
+            ResponseAuthorDTO response = new ResponseAuthorDTO() ;
+            response.setRoles_id(author.getRoles_id());
+            response.setFirst_name(author.getFirst_name());
+            response.setLast_name(author.getLast_name());
+            response.setPassword(author.getPassword());
+            response.setCreated_at(author.getCreated_at());
+            response.setUpdated_at(author.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseAuthorDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "save data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 

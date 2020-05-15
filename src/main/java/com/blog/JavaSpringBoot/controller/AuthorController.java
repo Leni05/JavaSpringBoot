@@ -122,9 +122,13 @@ public class AuthorController {
 
     }
 
+    // @PostMapping("/authors")
+    // public ResponseBaseDTO createAuthor(@Valid @RequestBody RequestAuthorDTO request) {
+    //     return ResponseBaseDTO.ok(authorService.save(request));
+    // }
     @PostMapping("/authors")
-    public ResponseBaseDTO createAuthor(@Valid @RequestBody RequestAuthorDTO request) {
-        return ResponseBaseDTO.ok(authorService.save(request));
+    public ResponseEntity createAuthor(@Valid @RequestBody RequestAuthorDTO request) {
+        return authorService.save(request);
     }
 
     @GetMapping("/authors/{id}")

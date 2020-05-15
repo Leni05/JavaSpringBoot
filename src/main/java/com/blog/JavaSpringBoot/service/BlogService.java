@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 /**
  * BlogService
@@ -29,11 +30,11 @@ public interface BlogService {
 
     Page<ResponseBlogDTO> findByName(Pageable pageable, String param);
 
-    ResponseBlogDTO save(RequestBlogDTO request);
+    ResponseEntity save(RequestBlogDTO request);
     
-    ResponseBaseDTO updateBlog(Integer id, RequestBlogUpdateDTO request);
+    ResponseEntity updateBlog(Integer id, RequestBlogUpdateDTO request);
 
-    void deleteById(Integer id);
+    ResponseEntity deleteById(Integer id);
 
     Page<ResponseBlogDTO> findByIdCategory(Pageable pageable, Integer categoryId);
 
