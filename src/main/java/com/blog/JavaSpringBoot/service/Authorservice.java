@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 /**
  * Authorservice
@@ -40,6 +41,10 @@ public interface Authorservice {
     ResponseAuthorDTO deleteById(Integer id);
 
     Author getByUsername(String username);
+
+    OAuth2AccessToken getToken(HashMap<String, String> params) throws HttpRequestMethodNotSupportedException;
+    OAuth2AccessToken getToken(Author author) throws HttpRequestMethodNotSupportedException;
+
 
     
 }

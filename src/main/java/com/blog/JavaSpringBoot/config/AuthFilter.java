@@ -10,9 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-/**
- * Auth Filter 
- */
+
 public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
@@ -23,17 +21,14 @@ public class AuthFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String imei = request.getParameter("imei");
         String username = request.getParameter("username");
-        String passw = request.getParameter("password");
+        String password = request.getParameter("password");
 
-        String usernameDomain = String.format("%s%s%s", username.trim(),
-                String.valueOf(Character.LINE_SEPARATOR), imei);
+        String usernameDomain = String.format("%s%s%s", username.trim());
 
         System.out.println(usernameDomain + " FILTER");
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(usernameDomain, passw);
-        // authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(usernameDomain, password);
         setDetails(request, authRequest);
 
         return this.getAuthenticationManager().authenticate(authRequest);

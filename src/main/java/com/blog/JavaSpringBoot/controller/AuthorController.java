@@ -2,24 +2,9 @@ package com.blog.JavaSpringBoot.controller;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.AuthorizationRequest;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.OAuth2Request;
-import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import com.blog.JavaSpringBoot.model.Author;
+import com.blog.JavaSpringBoot.model.Roles;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
+import com.blog.JavaSpringBoot.repository.RolesRepository;
 import com.blog.JavaSpringBoot.service.Authorservice;
 import com.blog.JavaSpringBoot.exception.ResponseBase;
 import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
@@ -62,9 +49,6 @@ import javax.validation.Valid;
 import com.blog.JavaSpringBoot.config.MyPage;
 import com.blog.JavaSpringBoot.config.MyPageable;
 
-// import org.springframework.security.authentication.AuthenticationManager;
-// import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * AuthorController
@@ -77,20 +61,6 @@ public class AuthorController {
 
     @Autowired
     private Authorservice authorService;
-
-    @Autowired
-	private DataSource dataSource;
-
-	@Autowired
-    private ClientDetailsService clientDetailsStore;
-
-    @Autowired
-    public TokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource);
-	}
-
-    @Autowired
-	private AuthenticationManager authenticationManager;
 
 
     //=================================================== With pagination ================================================
@@ -159,88 +129,50 @@ public class AuthorController {
     }
 
 
-    //Normal Login
-    @RequestMapping(value="/api/login", method = RequestMethod.POST)
+    @PostMapping("/login")
+    public ResponseBaseDTO<OAuth2AccessToken> login(@RequestBody LoginRequest request) {
+     
+        HashMap<String, String> params = request.getMap();
+        Author checkUser = authorService.getByUsername(params.get("username"));
 
-	public  ResponseEntity<ResponseOauthDTO> login(@RequestParam HashMap<String, String> params) throws Exception
-	{
-        // System.out.println("masukkkkk loginn");
-		ResponseOauthDTO response = new ResponseOauthDTO();
-		Author checkUser =  authorService.getByUsername(params.get("username"));
+        
+        if (checkUser == null) {
+            return ResponseBaseDTO.error("404", "User Not Found");
+        }
 
-	    if (checkUser != null)
-		{
-            // System.out.println("masukkkkk sini");
-			try {
-				OAuth2AccessToken token = this.getToken(params);
-			
-				response.setStatus(true);
-				response.setCode("200");
-				response.setMessage("success");
-				response.setData(token);
+        // if (checkUser != null) {
+        //     return ResponseBaseDTO.error("0001", "Your account is inactive, please contact support center");
+        // }
 
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} catch (Exception exception) {
-				
-                    response.setStatus(false);
-                    response.setCode("500");
-                    response.setMessage(exception.getMessage());
-			}
-		} else {
-            // System.out.println("masukkkkk catch");
-			throw new Exception();
-		}
-		
+        // if (checkUser != null && checkUser.getIsActive() == 2) {
+        //     return BaseResponse.error("0004", "Your account has been suspended, please contact support center");
+        // }
 
-		return new ResponseEntity<ResponseOauthDTO>(response, HttpStatus.UNAUTHORIZED);
+        try {
+            System.out.println("masuuuukkkkkkk" + checkUser+ "params : " + params);
+            OAuth2AccessToken token = this.authorService.getToken(params);
+            // if (checkUser != null) {
+            //     authorService.resetAttempt(checkUser.getId());
+            // }
+
+            return ResponseBaseDTO.ok(token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // if (checkUser != null) {
+            //     if (checkUser.getLoginAttempt() != null && checkUser.getLoginAttempt() == 5) {
+            //         ResponseBaseDTO.suspendUserLogin(checkUser.getId());
+
+            //         return ResponseBaseDTO.error("0004", "Your account has been suspended, please contact support center");
+            //     } else {
+            //         userService.updateAttempt(checkUser.getId());
+
+            //         return BaseResponse.error("0005", "Your password is incorrect");
+            //     }
+            // }
+            return ResponseBaseDTO.error("404", "Error Login");
+        }
+
+        // return ResponseBaseDTO.error("404", "Internal Server Error");
     }
-    
-    private OAuth2AccessToken getToken(HashMap<String, String> params) throws HttpRequestMethodNotSupportedException {
-		if (params.get("username") == null ) {
-			throw new UsernameNotFoundException("username not found");
-		}
 
-		if (params.get("password") == null) {
-			throw new UsernameNotFoundException("password not found");
-		}
-
-		if (params.get("client_id") == null) {
-			throw new UsernameNotFoundException("client_id not found");
-		}
-
-		if (params.get("client_secret") == null) {
-			throw new UsernameNotFoundException("client_secret not found");
-		}
-
-		DefaultOAuth2RequestFactory defaultOAuth2RequestFactory = new DefaultOAuth2RequestFactory(clientDetailsStore);
-
-		AuthorizationRequest authorizationRequest = defaultOAuth2RequestFactory.createAuthorizationRequest(params);
-		authorizationRequest.setApproved(true);
-
-		OAuth2Request oauth2Request = defaultOAuth2RequestFactory.createOAuth2Request(authorizationRequest);
-		
-		final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(
-				params.get("username"), params.get("password"));
-		org.springframework.security.core.Authentication authentication = authenticationManager
-                .authenticate(loginToken);
-
-		OAuth2Authentication authenticationRequest = new OAuth2Authentication(oauth2Request, authentication);
-		authenticationRequest.setAuthenticated(true);
-
-		OAuth2AccessToken token = tokenServices().createAccessToken(authenticationRequest);
-
-
-		return token;
-    } 
-    
-    @Autowired
-	public AuthorizationServerTokenServices tokenServices() {
-		final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-		defaultTokenServices.setAccessTokenValiditySeconds(-1);
-
-		defaultTokenServices.setTokenStore(tokenStore());
-		return defaultTokenServices;
-	}
-
-  
 }

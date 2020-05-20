@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class ResponseAuthorDTO {
     private Integer id;
-    private Integer roles_id;
+    private ResponseRolesDTO role;
     private String first_name;
     private String last_name;
     private String username;
