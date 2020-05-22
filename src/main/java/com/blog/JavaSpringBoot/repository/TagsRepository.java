@@ -20,5 +20,8 @@ public interface TagsRepository extends PagingAndSortingRepository<Tags, Integer
    
    	@Query("select e from #{#entityName} e where e.name like %:param% ")
 	Page<Tags> findByName(Pageable pageable, String param);
+
+	@Query(value = "SELECT * from tags WHERE id = ?1", nativeQuery = true)
+	Tags getById(Integer id);
     
 }

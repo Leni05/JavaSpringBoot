@@ -35,7 +35,7 @@ public class Tags implements Serializable{
 
     private Integer id;
 
-    @Column(length = 20, nullable = false, unique = true, updatable = true)
+    @Column(length = 20, nullable = false, updatable = true)
     @Size(min = 2, max = 20)
     @NotBlank
     private String name;

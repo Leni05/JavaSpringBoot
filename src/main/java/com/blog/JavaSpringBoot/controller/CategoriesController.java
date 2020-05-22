@@ -174,27 +174,25 @@ public class CategoriesController {
     
      
     @PostMapping
-    public ResponseBaseDTO createCategories(@Valid @RequestBody RequestCategoriesDTO request) {
-        return ResponseBaseDTO.ok(categoriesService.save(request));
+    public ResponseEntity createCategories(@Valid @RequestBody RequestCategoriesDTO request) {
+        return categoriesService.save(request);
     }
 
     @PutMapping("{id}")
-    public ResponseBaseDTO updateCategories(
+    public ResponseEntity updateCategories(
          @Valid @RequestBody RequestCategoriesDTO request, @PathVariable("id") Integer id
     ) {
-       categoriesService.update(id, request);
-       return ResponseBaseDTO.ok(categoriesService.update(id, request));
+        return categoriesService.update(id, request);
     }
 
     @GetMapping("/{id}")
-    public ResponseBaseDTO<ResponseCategoriesDTO> getOne(@PathVariable Integer id) {
-        return ResponseBaseDTO.ok(categoriesService.findById(id));
+    public ResponseEntity getOne(@PathVariable Integer id) {
+        return categoriesService.findById(id);
     }
 
     @DeleteMapping
-    public ResponseBaseDTO deleteCategories(@RequestBody Categories categories) {
-        
-       return ResponseBaseDTO.ok(categoriesService.deleteById(categories.getId()));
+    public ResponseEntity deleteCategories(@RequestBody Categories categories) {        
+       return categoriesService.deleteById(categories.getId());
     }
     
 

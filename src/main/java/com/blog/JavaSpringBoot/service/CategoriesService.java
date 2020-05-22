@@ -1,6 +1,5 @@
 package com.blog.JavaSpringBoot.service;
 
-
 import com.blog.JavaSpringBoot.model.Categories;
 import com.blog.JavaSpringBoot.repository.CategoriesRepository;
 
@@ -11,6 +10,7 @@ import com.blog.JavaSpringBoot.dto.request.RequestCategoriesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 /**
  * CategoriesService
@@ -19,15 +19,15 @@ public interface CategoriesService {
 
     Page<ResponseCategoriesDTO> findAll(Pageable pageable);
 
-    ResponseCategoriesDTO findById(Integer id);
+    ResponseEntity findById(Integer id);
 
     Page<ResponseCategoriesDTO> findByName(Pageable pageable, String param);   
 
-    ResponseCategoriesDTO save(RequestCategoriesDTO request);
+    ResponseEntity save(RequestCategoriesDTO request);
 
-    ResponseCategoriesDTO update(Integer id, RequestCategoriesDTO request);
+    ResponseEntity update(Integer id, RequestCategoriesDTO request);
 
-    ResponseCategoriesDTO deleteById(Integer id);
+    ResponseEntity deleteById(Integer id);
 
      // ResponseTagsDTO findByName(String name);
     // @Autowired

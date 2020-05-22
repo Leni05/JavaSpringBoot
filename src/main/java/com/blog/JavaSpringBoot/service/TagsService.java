@@ -1,6 +1,5 @@
 package com.blog.JavaSpringBoot.service;
 
-
 import com.blog.JavaSpringBoot.model.Tags;
 import com.blog.JavaSpringBoot.repository.TagsRepository;
 
@@ -11,6 +10,7 @@ import com.blog.JavaSpringBoot.dto.request.RequestTagsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 /**
  * TagService
@@ -25,11 +25,11 @@ public interface TagsService {
 
     // ResponseTagsDTO findByName(String name);
 
-    ResponseTagsDTO save(RequestTagsDTO request);
+    ResponseEntity save(RequestTagsDTO request);
 
-    ResponseTagsDTO update(Integer id, RequestTagsDTO request);
+    ResponseEntity update(Integer id, RequestTagsDTO request);
 
-    ResponseTagsDTO deleteById(Integer id);
+    ResponseEntity deleteById(Integer id);
     
 
     // @Autowired

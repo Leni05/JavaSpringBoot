@@ -173,16 +173,19 @@ public class TagsController {
     
     
     @PostMapping
-    public ResponseBaseDTO createTags(@Valid @RequestBody RequestTagsDTO request) {
-        return ResponseBaseDTO.ok(tagsService.save(request));
+    public ResponseEntity createAuthor(@Valid @RequestBody RequestTagsDTO request) {
+        return tagsService.save(request);
     }
+    // public ResponseBaseDTO createTags(@Valid @RequestBody RequestTagsDTO request) {
+    //     return ResponseBaseDTO.ok(tagsService.save(request));
+    // }
 
     @PutMapping("{id}")
-    public ResponseBaseDTO updateTag(
+    public ResponseEntity updateTag(
          @Valid @RequestBody RequestTagsDTO request, @PathVariable("id") Integer id
     ) {
-       tagsService.update(id, request);
-       return ResponseBaseDTO.ok(tagsService.update(id, request));
+       return tagsService.update(id, request);
+      
     }
 
 
@@ -192,9 +195,8 @@ public class TagsController {
     }
 
     @DeleteMapping
-    public ResponseBaseDTO deleteTag(@RequestBody Tags tag) {
-        
-       return ResponseBaseDTO.ok(tagsService.deleteById(tag.getId()));
+    public ResponseEntity deleteTag(@RequestBody Tags tag) {        
+       return tagsService.deleteById(tag.getId());
     }
 
 }

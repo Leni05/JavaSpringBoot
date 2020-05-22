@@ -34,11 +34,11 @@ public interface Authorservice {
 
     ResponseEntity save(RequestAuthorDTO request);
 
-    ResponseAuthorUpdateDTO update(Integer id, RequestAuthorUpdateDTO request);
+    ResponseEntity update(Integer id, RequestAuthorUpdateDTO request);
 
     ResponseAuthorPasswordDTO updatePass(Integer id, RequestAuthorPasswordDTO request);
 
-    ResponseAuthorDTO deleteById(Integer id);
+    ResponseEntity deleteById(Integer id);
 
     Author getByUsername(String username);
 

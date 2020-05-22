@@ -4,17 +4,25 @@ import java.util.Date;
 
 import com.blog.JavaSpringBoot.dto.request.RequestCategoriesDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseCategoriesDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseDataDTO;
 import com.blog.JavaSpringBoot.exception.ResourceNotFoundException;
 
 import com.blog.JavaSpringBoot.repository.CategoriesRepository;
+import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.model.Categories;
 import com.blog.JavaSpringBoot.service.CategoriesService;
 import com.blog.JavaSpringBoot.util.DateTime;
+import com.blog.JavaSpringBoot.util.PropertiesUtil;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,20 +40,43 @@ public class CategoriesServiceImpl implements CategoriesService {
     @Autowired
     private DateTime dateTime;
 
+    @Autowired
+    private Environment env;
+
     private static final String RESOURCE = "Categories";
     private static final String FIELD = "id";
 
     @Override
-    public ResponseCategoriesDTO deleteById(Integer id) {
+    public ResponseEntity deleteById(Integer id) {
+        ResponseDataDTO<ResponseCategoriesDTO> responseData = new ResponseDataDTO<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Author roleLogin = (Author) auth.getPrincipal();  
+
+        Categories categories = categoriesRepository.getById(id);
         try {
-            Categories categories = categoriesRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+            if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {            
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "Access denied", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
+            
+            if(categories == null ){
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "category not found", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }  
+            
+            ResponseCategoriesDTO response = new ResponseCategoriesDTO() ;
+            response.setId(categories.getId());
+            response.setName(categories.getName());
+            response.setCreated_at(categories.getCreated_at());
+            response.setUpdated_at(categories.getUpdated_at());
             categoriesRepository.deleteById(id);
 
-            return fromEntity(categories);
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "create data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -72,17 +103,34 @@ public class CategoriesServiceImpl implements CategoriesService {
     // }
 
     @Override
-    public ResponseCategoriesDTO findById(Integer id) {
+    public ResponseEntity findById(Integer id) {
+        ResponseDataDTO<ResponseCategoriesDTO> responseData = new ResponseDataDTO<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Author roleLogin = (Author) auth.getPrincipal();  
+
+        Categories categories = categoriesRepository.getById(id);
         try {
-            Categories categories = categoriesRepository.findById(id).orElseThrow(()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE));
+            if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {            
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "Access denied", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
             
-            return fromEntity(categories);
-        } catch (ResourceNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            if(categories == null ){
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "category not found", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }  
+
+            ResponseCategoriesDTO response = new ResponseCategoriesDTO() ;
+            response.setId(categories.getId());
+            response.setName(categories.getName());
+            response.setCreated_at(categories.getCreated_at());
+            response.setUpdated_at(categories.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "create data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -98,42 +146,74 @@ public class CategoriesServiceImpl implements CategoriesService {
     }
 
     @Override
-    public ResponseCategoriesDTO save(RequestCategoriesDTO request) {
+    public ResponseEntity save(RequestCategoriesDTO request) {
+        ResponseDataDTO<ResponseCategoriesDTO> responseData = new ResponseDataDTO<>();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Author roleLogin = (Author) auth.getPrincipal();  
+
         try {
+            if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {            
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "Access denied", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            } 
+
             Categories categories = new Categories();
 
             categories.setName(request.getName());
             categories.setCreated_at(new Date());
-            categories.setUpdated_at(new Date());
-
-            
+            categories.setUpdated_at(new Date());           
             categoriesRepository.save(categories);
-            return fromEntity(categories);
+            // return fromEntity(categories);
+            ResponseCategoriesDTO response = new ResponseCategoriesDTO() ;
+            response.setId(categories.getId());
+            response.setName(categories.getName());
+            response.setCreated_at(categories.getCreated_at());
+            response.setUpdated_at(categories.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "create data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 
     @Override
-    public ResponseCategoriesDTO update(Integer id, RequestCategoriesDTO request) {
+    public ResponseEntity update(Integer id, RequestCategoriesDTO request) {
+
+        ResponseDataDTO<ResponseCategoriesDTO> responseData = new ResponseDataDTO<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Author roleLogin = (Author) auth.getPrincipal();  
+
+        Categories categories = categoriesRepository.getById(id);
         try {
-            Categories categories = categoriesRepository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException(id.toString(), FIELD, RESOURCE)
-            );   
+            if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {            
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "Access denied", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
+            
+            if(categories == null ){
+                responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "category not found", null);
+                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            }
             
             BeanUtils.copyProperties(request, categories);
             categories.setUpdated_at(new Date());
             categoriesRepository.save(categories);
 
-            return fromEntity(categories);
-        } catch (ResourceNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            ResponseCategoriesDTO response = new ResponseCategoriesDTO() ;
+            response.setId(categories.getId());
+            response.setName(categories.getName());
+            response.setCreated_at(categories.getCreated_at());
+            response.setUpdated_at(categories.getUpdated_at());
+
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(true, 200, "success", response);
+            return ResponseEntity.ok(responseData);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            responseData = new ResponseDataDTO<ResponseCategoriesDTO>(false, 404, "create data gagal", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
         }
     }
 

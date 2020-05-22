@@ -107,11 +107,10 @@ public class AuthorController {
     }
 
     @PutMapping("/authors/{id}")
-    public ResponseBaseDTO updateAuthor(
+    public ResponseEntity updateAuthor(
          @Valid @RequestBody RequestAuthorUpdateDTO request, @PathVariable("id") Integer id
-    ) {
-       authorService.update(id, request);
-       return ResponseBaseDTO.ok(authorService.update(id, request));
+    ) {     
+       return authorService.update(id, request);
     }
 
     @PutMapping("/authors/{id}/password")
@@ -123,9 +122,8 @@ public class AuthorController {
     }
 
     @DeleteMapping("/authors")
-    public ResponseBaseDTO deleteTag(@RequestBody Author author) {
-        
-       return ResponseBaseDTO.ok(authorService.deleteById(author.getId()));
+    public ResponseEntity delete(@RequestBody Author author) {        
+       return authorService.deleteById(author.getId());
     }
 
 
