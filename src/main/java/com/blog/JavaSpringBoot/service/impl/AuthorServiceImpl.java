@@ -99,8 +99,15 @@ public class AuthorServiceImpl implements Authorservice {
     
     @Autowired
     public AuthorizationServerTokenServices tokenServices() {
+        // final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        // defaultTokenServices.setAccessTokenValiditySeconds(-1);
+
+        // defaultTokenServices.setTokenStore(tokenStore());
+        // return defaultTokenServices;
         final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setAccessTokenValiditySeconds(-1);
+        defaultTokenServices.setSupportRefreshToken(true);
+        defaultTokenServices.setRefreshTokenValiditySeconds(6 * 60 * 60);
+        defaultTokenServices.setAccessTokenValiditySeconds(1 * 60 * 60);
 
         defaultTokenServices.setTokenStore(tokenStore());
         return defaultTokenServices;
@@ -218,10 +225,10 @@ public class AuthorServiceImpl implements Authorservice {
     public ResponseEntity save(RequestAuthorDTO request) {
         ResponseDataDTO<ResponseAuthorDTO> responseData = new ResponseDataDTO<>();
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Author roleLogin = (Author) auth.getPrincipal();      
-        // Author roleLogin = authorRepository.findByUsername(auth.getName());
-        System.out.println("masukkkkk" + roleLogin.getRole().getId());
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Author roleLogin = (Author) auth.getPrincipal();      
+        // // Author roleLogin = authorRepository.findByUsername(auth.getName());
+        // System.out.println("masukkkkk" + roleLogin.getRole().getId());
 
         
         try {
@@ -229,11 +236,11 @@ public class AuthorServiceImpl implements Authorservice {
             Roles roles =  rolesRepository.findByIdRoles(request.getRoles_id());
 
           
-            if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {
+            // if (!roleLogin.getRole().getId().equals(PropertiesUtil.getRoleSysAdminID(env))) {
             
-                responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "Access denied", null);
-                return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
-            } 
+            //     responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "Access denied", null);
+            //     return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+            // } 
             if( roles == null ){
                 // System.out.println("roles" + roleLogin.getRoles_id());
 

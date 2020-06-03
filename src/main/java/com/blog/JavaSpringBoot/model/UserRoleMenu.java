@@ -21,13 +21,17 @@ import java.util.Date;
 @Table(name = "user_role_apps_menu", schema = "public")
 public class UserRoleMenu implements Serializable {
 
-    @EmbeddedId
-    private UserRoleMenuKey id;
+    // @EmbeddedId
+    // private UserRoleMenuKey id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("user_role_id")
     @JoinColumn(name = "user_role_id")
-    private Roles role;
+    private Roles roles;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("menu_id")
@@ -45,6 +49,9 @@ public class UserRoleMenu implements Serializable {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="dd-MM-yyyy HH:mm:ss",timezone="GMT+7")
     @UpdateTimestamp
     private Date updated_at;
+
+    @Column(name="request_type")
+	private String requestType;
 
 
 }

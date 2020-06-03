@@ -24,5 +24,8 @@ public interface RolesRepository extends PagingAndSortingRepository<Roles, Integ
     
     @Query(value = "SELECT * from roles WHERE id = ?1", nativeQuery = true)
     Roles findByIdRoles(Integer id);
+
+    @Query(value = "SELECT * from roles WHERE name =:roles", nativeQuery = true)
+    Roles findByNames(String roles);
     
 }

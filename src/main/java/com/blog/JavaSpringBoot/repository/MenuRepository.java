@@ -26,5 +26,19 @@ public interface MenuRepository extends JpaRepository<Menu, Integer> {
     @Query("SELECT m FROM Menu m ")
     Page<Menu> findAllMenu(Pageable pageable);
 
+    // @Query(value = "SELECT * from menu WHERE menuLink = ?1", nativeQuery = true)
+    // Menu getMenuLink(String params);
+
+    // @Query("select e from #{#entityName} e where e.menuLink=:params")
+    // public getMenuLink findByRoleIdAndMenuId(String params);
+
+    // @Query("select e from #{#entityName} e where e.menu_link like %:param% ")
+    // Menu findByMenu(String param);
+
+    @Query(value = "SELECT * from menu WHERE menu_link =:params", nativeQuery = true)
+    Menu findByMenu(String params);
+
+
+
 }
 

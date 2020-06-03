@@ -3,6 +3,7 @@ package com.blog.JavaSpringBoot.controller;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -27,11 +28,15 @@ import javax.sql.DataSource;
 
 import com.blog.JavaSpringBoot.model.Author;
 import com.blog.JavaSpringBoot.model.Roles;
+import com.blog.JavaSpringBoot.model.UserRoleMenu;
 import com.blog.JavaSpringBoot.repository.AuthorRepository;
 import com.blog.JavaSpringBoot.repository.RolesRepository;
+import com.blog.JavaSpringBoot.repository.UserRoleMenuRepository;
 import com.blog.JavaSpringBoot.service.Authorservice;
+import com.blog.JavaSpringBoot.service.RoleMenuService;
 import com.blog.JavaSpringBoot.exception.ResponseBase;
 import com.blog.JavaSpringBoot.dto.response.ResponseBaseDTO;
+import com.blog.JavaSpringBoot.dto.response.ResponseDataDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseOauthDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseAuthorDTO;
 import com.blog.JavaSpringBoot.dto.response.ResponseAuthorPasswordDTO;
@@ -61,6 +66,9 @@ public class AuthorController {
 
     @Autowired
     private Authorservice authorService;
+
+    @Autowired
+    RoleMenuService roleMenuService;
 
 
     //=================================================== With pagination ================================================
@@ -97,7 +105,17 @@ public class AuthorController {
     //     return ResponseBaseDTO.ok(authorService.save(request));
     // }
     @PostMapping("/authors")
-    public ResponseEntity createAuthor(@Valid @RequestBody RequestAuthorDTO request) {
+    public ResponseEntity createAuthor(@Valid @RequestBody RequestAuthorDTO request, HttpServletRequest requests) {
+        
+        ResponseDataDTO<ResponseAuthorDTO> responseData = new ResponseDataDTO<>();
+
+        boolean roleAccess = roleMenuService.roleAccess("/authors", requests.getMethod());
+
+        if(roleAccess ==false){
+            responseData = new ResponseDataDTO<ResponseAuthorDTO>(false, 404, "Access denied", null);
+            return new ResponseEntity<>(responseData, HttpStatus.NOT_FOUND);
+        }
+
         return authorService.save(request);
     }
 
